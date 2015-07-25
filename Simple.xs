@@ -241,7 +241,7 @@ test(...)
   }
 
   lines = NULL;
-  if (setjmp(png_jmpbuf(png))) {
+  if (sigsetjmp(png_jmpbuf(png), 0)) {
     png_destroy_write_struct(png, info);
     if (lines != NULL) {
       free(lines);

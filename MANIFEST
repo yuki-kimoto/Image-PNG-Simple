@@ -10,6 +10,7 @@ gzguts.h
 gzlib.c
 gzread.c
 gzwrite.c
+Image-PNG-Simple-0.01.tar.gz
 infback.c
 inffast.c
 inffast.h
@@ -361,6 +362,7 @@ Simple.xs
 t/basic.t
 t/dog.bmp
 t/dog_copy.bmp
+t/dog_copy.png
 trees.c
 trees.h
 uncompr.c
