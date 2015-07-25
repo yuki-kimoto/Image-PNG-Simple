@@ -12,12 +12,10 @@
 #include "XSUB.h"
 
 #include "ppport.h"
-#include "png.h"
-#include "zlib.h"
 
+#include "png.h"
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+
 #define HEADERSIZE   54               /* ヘッダのサイズ 54 = 14 + 40         */
 #define PALLETSIZE 1024               /* パレットのサイズ                    */
 #define MAXWIDTH   1000               /* 幅(pixel)の上限                     */
@@ -53,7 +51,7 @@ typedef struct {
   long width;
   long real_width;
   color data[MAXHEIGHT][MAXWIDTH];
-  IV rgb_data[MAXHEIGHT][MAXWIDTH]
+  IV rgb_data[MAXHEIGHT][MAXWIDTH];
 } img;
 
 void ReadBmp(char *filename, img *imgp);
@@ -212,7 +210,7 @@ void WriteBmp(char *filename, img *tp) {
   fclose(Out_Fp);
 }
 
-#line 216 "Simple.c"
+#line 214 "Simple.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -354,7 +352,7 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 #define newXSproto_portable(name, c_impl, file, proto) (PL_Sv=(SV*)newXS(name, c_impl, file), sv_setpv(PL_Sv, proto), (CV*)PL_Sv)
 #endif /* !defined(newXS_flags) */
 
-#line 358 "Simple.c"
+#line 356 "Simple.c"
 
 XS_EUPXS(XS_Image__PNG__Simple_test); /* prototype to pass -Wmissing-prototypes */
 XS_EUPXS(XS_Image__PNG__Simple_test)
@@ -365,7 +363,7 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
     SP -= items;
     {
 	SV	RETVAL;
-#line 211 "Simple.xs"
+#line 209 "Simple.xs"
 {
   png_structp png;
   png_infop info;
@@ -378,10 +376,10 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
 
   tmp1=(img *)malloc(sizeof(img));
 
-  ReadBmp("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog.bmp",tmp1);
-  WriteBmp("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog_copy.bmp",tmp1);
+  ReadBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog.bmp",tmp1);
+  WriteBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.bmp",tmp1);
 
-  outf = fopen("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog_copy.png", "wb");
+  outf = fopen("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.png", "wb");
   if (!outf)
   {
     croak("Can't open png file for writing");
@@ -422,8 +420,6 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
   sBIT.alpha = (png_byte)(Bmp_color == 32 ? 8 : 0);
   png_set_sBIT(png, info, &sBIT);
 
-  png_set_compression_level(png, Z_BEST_COMPRESSION);
-
   png_write_info(png, info);
   png_set_bgr(png);
 
@@ -443,7 +439,7 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
 
   XSRETURN(0);
 }
-#line 447 "Simple.c"
+#line 443 "Simple.c"
 	PUTBACK;
 	return;
     }

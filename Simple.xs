@@ -3,12 +3,10 @@
 #include "XSUB.h"
 
 #include "ppport.h"
-#include "png.h"
-#include "zlib.h"
 
+#include "png.h"
 #include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+
 #define HEADERSIZE   54               /* ヘッダのサイズ 54 = 14 + 40         */
 #define PALLETSIZE 1024               /* パレットのサイズ                    */
 #define MAXWIDTH   1000               /* 幅(pixel)の上限                     */
@@ -44,7 +42,7 @@ typedef struct {
   long width;
   long real_width;
   color data[MAXHEIGHT][MAXWIDTH];
-  IV rgb_data[MAXHEIGHT][MAXWIDTH]
+  IV rgb_data[MAXHEIGHT][MAXWIDTH];
 } img;
 
 void ReadBmp(char *filename, img *imgp);
@@ -220,10 +218,10 @@ test(...)
   
   tmp1=(img *)malloc(sizeof(img));
   
-  ReadBmp("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog.bmp",tmp1);
-  WriteBmp("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog_copy.bmp",tmp1);
+  ReadBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog.bmp",tmp1);
+  WriteBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.bmp",tmp1);
 
-  outf = fopen("/home/kimoto/labo/tmp/png/Image-PNG-Simple/t/dog_copy.png", "wb");
+  outf = fopen("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.png", "wb");
   if (!outf)
   {
     croak("Can't open png file for writing");
