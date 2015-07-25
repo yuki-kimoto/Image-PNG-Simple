@@ -19,6 +19,7 @@ core.*
 t/dog_copy.png
 t/dog_copy.bmp
 
+Simple.c
 adler32.c
 compress.c
 crc32.c
