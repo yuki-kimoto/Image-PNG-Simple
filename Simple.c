@@ -424,7 +424,7 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
 
   for (y = 0; y < tmp1->height; y++) {
-    lines[y] = (png_bytep)&(tmp1->data[0][0]);
+    lines[y] = (png_bytep)&(tmp1->data[tmp1->height - y - 1]);
   }
 
   png_write_image(png, lines);
