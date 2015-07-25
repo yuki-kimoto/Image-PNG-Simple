@@ -32,7 +32,7 @@ my @libpng_sources = qw(
   pngwtran.c
   pngwutil.c
 );
-my $libpng_libconf_soruce_from = 'script/libconf.h.prebuilt';
+my $libpng_libconf_soruce_from = 'scripts/pnglibconf.h.prebuilt';
 my $libpng_libconf_soruce_to = 'pnglibconf.h';
 
 # Copy libpng source
@@ -42,7 +42,9 @@ for my $libpng_source (@libpng_sources) {
     or die "Can't copy $libpng_source: $!";
   push @cleanup_files, $libpng_source;
 }
-copy "$libpng_dir/$libpng_libconf_soruce_from", "$FindBin::Bin/$libpng_libconf_soruce_to";
+copy "$libpng_dir/$libpng_libconf_soruce_from", "$FindBin::Bin/$libpng_libconf_soruce_to"
+  or die "Can't copy $libpng_libconf_soruce_from to $libpng_libconf_soruce_to: $!";
+  
 push @cleanup_files, $libpng_libconf_soruce_to;
 
 # zlib source and header (zlib-1.2.8)

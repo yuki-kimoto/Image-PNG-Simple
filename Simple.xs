@@ -202,8 +202,9 @@ SV
 test(...)
   PPCODE:
 {
+  png_structp png;
 
-  /* 画像データを格納する構造体変数へのポインタ  */
+
   img *tmp1;
   
   tmp1=(img *)malloc(sizeof(img));
