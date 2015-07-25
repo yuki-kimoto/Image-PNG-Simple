@@ -1,4 +1,4 @@
-use 5.016003;
+use 5.008007;
 use ExtUtils::MakeMaker;
 use FindBin;
 use File::Copy 'copy';

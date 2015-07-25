@@ -422,6 +422,8 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
   sBIT.alpha = (png_byte)(Bmp_color == 32 ? 8 : 0);
   png_set_sBIT(png, info, &sBIT);
 
+  png_set_compression_level(png, Z_BEST_COMPRESSION);
+
   png_write_info(png, info);
   png_set_bgr(png);
 
@@ -441,7 +443,7 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
 
   XSRETURN(0);
 }
-#line 445 "Simple.c"
+#line 447 "Simple.c"
 	PUTBACK;
 	return;
     }
