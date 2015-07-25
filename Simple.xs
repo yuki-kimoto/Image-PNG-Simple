@@ -44,6 +44,7 @@ typedef struct {
   long width;
   long real_width;
   color data[MAXHEIGHT][MAXWIDTH];
+  IV rgb_data[MAXHEIGHT][MAXWIDTH]
 } img;
 
 void ReadBmp(char *filename, img *imgp);
@@ -117,9 +118,12 @@ void ReadBmp(char *filename, img *imgp) {
   for(i=0;i<imgp->height;i++) {
     fread(Bmp_Data,1,Real_width,Bmp_Fp);
     for (j=0;j<imgp->width;j++) {
-      imgp->data[imgp->height-i-1][j].b = Bmp_Data[j*3];
+      imgp->data[imgp->height-i-1][j].r = Bmp_Data[j*3];
       imgp->data[imgp->height-i-1][j].g = Bmp_Data[j*3+1];
-      imgp->data[imgp->height-i-1][j].r = Bmp_Data[j*3+2];
+      imgp->data[imgp->height-i-1][j].b = Bmp_Data[j*3+2];
+      
+      imgp->rgb_data[imgp->height-i-1][j]
+        = (IV)Bmp_Data[j*3+2] * (16*16) + (IV)Bmp_Data[j*3+1] * (16) + (IV)Bmp_Data[j*3];
     }
   }
 
@@ -182,9 +186,9 @@ void WriteBmp(char *filename, img *tp) {
   /* 画像データ書き出し */
   for (i=0;i<tp->height;i++) {
     for (j=0;j<tp->width;j++) {
-      Bmp_Data[j*3]   = tp->data[tp->height-i-1][j].b;
+      Bmp_Data[j*3]   = tp->data[tp->height-i-1][j].r;
       Bmp_Data[j*3+1] = tp->data[tp->height-i-1][j].g;
-      Bmp_Data[j*3+2] = tp->data[tp->height-i-1][j].r;
+      Bmp_Data[j*3+2] = tp->data[tp->height-i-1][j].b;
     }
     for (j=tp->width*3;j<Real_width;j++) {
       Bmp_Data[j]=0;
@@ -266,7 +270,7 @@ test(...)
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
   
   for (y = 0; y < tmp1->height; y++) {
-    lines[y] = (png_bytep)&(tmp1->data[tmp1->height - y - 1]);
+    lines[y] = (png_bytep)&(tmp1->data[y]);
   }
 
   png_write_image(png, lines);
