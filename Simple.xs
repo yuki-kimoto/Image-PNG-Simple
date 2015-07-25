@@ -6,6 +6,7 @@
 
 #include "png.h"
 #include <stdio.h>
+#include <setjmp.h>
 
 #define HEADERSIZE   54               /* ヘッダのサイズ 54 = 14 + 40         */
 #define PALLETSIZE 1024               /* パレットのサイズ                    */
@@ -241,7 +242,7 @@ test(...)
   }
 
   lines = NULL;
-  if (sigsetjmp(png_jmpbuf(png), 0)) {
+  if (setjmp(png_jmpbuf(png))) {
     png_destroy_write_struct(png, info);
     if (lines != NULL) {
       free(lines);
