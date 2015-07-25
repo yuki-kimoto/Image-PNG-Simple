@@ -208,7 +208,7 @@ test(...)
   png_structp png;
   png_infop info;
   png_color_8 sBIT;
-  png_bytep *lines;
+  png_bytep* lines;
   FILE *outf;
   UV y;
 
@@ -266,7 +266,7 @@ test(...)
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
 
   for (y = 0; y < tmp1->height; y++) {
-    lines[y] = (png_bytep)&(tmp1->data[tmp1->real_width * (tmp1->height - y - 1)][0]);
+    lines[y] = (png_bytep)&(tmp1->data[0][0]);
   }
 
   png_write_image(png, lines);
