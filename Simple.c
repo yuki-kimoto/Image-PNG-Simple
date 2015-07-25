@@ -51,6 +51,7 @@ typedef struct {                      /* 1ピクセルあたりの赤緑青の�
 typedef struct {
   long height;
   long width;
+  long real_width;
   color data[MAXHEIGHT][MAXWIDTH];
 } img;
 
@@ -76,6 +77,7 @@ void Diminish(img *sp, img *tp, unsigned char x);
 void ReadBmp(char *filename, img *imgp) {
   int i,j;
   int Real_width;
+  int y;
   FILE *Bmp_Fp=fopen(filename,"rb");  /* バイナリモード読み込み用にオープン  */
   unsigned char *Bmp_Data;           /* 画像データを1行分格納               */
 
@@ -112,6 +114,7 @@ void ReadBmp(char *filename, img *imgp) {
   }
     
   Real_width = imgp->width*3 + imgp->width%4; /* 4byte 境界にあわせるために実際の幅の計算 */
+  imgp->real_width = Real_width;
 
  /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
  if((Bmp_Data = (unsigned char *)calloc(Real_width,sizeof(unsigned char)))==NULL) {
@@ -205,7 +208,7 @@ void WriteBmp(char *filename, img *tp) {
   fclose(Out_Fp);
 }
 
-#line 209 "Simple.c"
+#line 212 "Simple.c"
 #ifndef PERL_UNUSED_VAR
 #  define PERL_UNUSED_VAR(var) if (0) var = var
 #endif
@@ -347,7 +350,7 @@ S_croak_xs_usage(pTHX_ const CV *const cv, const char *const params)
 #define newXSproto_portable(name, c_impl, file, proto) (PL_Sv=(SV*)newXS(name, c_impl, file), sv_setpv(PL_Sv, proto), (CV*)PL_Sv)
 #endif /* !defined(newXS_flags) */
 
-#line 351 "Simple.c"
+#line 354 "Simple.c"
 
 XS_EUPXS(XS_Image__PNG__Simple_test); /* prototype to pass -Wmissing-prototypes */
 XS_EUPXS(XS_Image__PNG__Simple_test)
@@ -358,14 +361,14 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
     SP -= items;
     {
 	SV	RETVAL;
-#line 204 "Simple.xs"
+#line 207 "Simple.xs"
 {
   png_structp png;
   png_infop info;
   png_color_8 sBIT;
   png_bytep *lines;
   FILE *outf;
-
+  UV y;
 
   img *tmp1;
 
@@ -409,10 +412,32 @@ XS_EUPXS(XS_Image__PNG__Simple_test)
       (Bmp_color == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
 
+  sBIT.red = 8;
+  sBIT.green = 8;
+  sBIT.blue = 8;
+  sBIT.alpha = (png_byte)(Bmp_color == 32 ? 8 : 0);
+  png_set_sBIT(png, info, &sBIT);
+
+  png_write_info(png, info);
+  png_set_bgr(png);
+
+  lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
+
+  for (y = 0; y < tmp1->height; y++) {
+    lines[y] = (png_bytep)&(tmp1->data[tmp1->real_width * (tmp1->height - y - 1)][0]);
+  }
+
+  png_write_image(png, lines);
+  // png_write_end(png, info);
+  png_destroy_write_struct(&png, &info);
+
+  free(lines);
+  free(tmp1);
+  fclose(outf);
 
   XSRETURN(0);
 }
-#line 416 "Simple.c"
+#line 441 "Simple.c"
 	PUTBACK;
 	return;
     }
