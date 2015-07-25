@@ -7,9 +7,11 @@
 #include "png.h"
 #include <stdio.h>
 
-# undef setjmp
-# undef longjmp
-#include <setjmp.h>
+#ifdef WIN32
+#  undef setjmp
+#  undef longjmp
+#  include <setjmp.h>
+#endif
 
 #define HEADERSIZE   54               /* ヘッダのサイズ 54 = 14 + 40         */
 #define PALLETSIZE 1024               /* パレットのサイズ                    */
@@ -73,13 +75,13 @@ void ReadBmp(char *filename, img *imgp) {
   int Real_width;
   int y;
   FILE *Bmp_Fp=fopen(filename,"rb");  /* バイナリモード読み込み用にオープン  */
-  unsigned char *Bmp_Data;           /* 画像データを1行分格納               */
+  unsigned char* Bmp_Data;           /* 画像データを1行分格納               */
 
   if(Bmp_Fp==NULL){
     fprintf(stderr,"Error: file %s couldn\'t open for read!.\n",filename);
     exit(1);
   }
-
+  
   /* ヘッダ読み込み */
   fread(Bmp_headbuf,sizeof(unsigned char),HEADERSIZE,Bmp_Fp);
         
@@ -111,10 +113,10 @@ void ReadBmp(char *filename, img *imgp) {
   imgp->real_width = Real_width;
 
  /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
- if((Bmp_Data = (unsigned char *)calloc(Real_width,sizeof(unsigned char)))==NULL) {
+ if((Bmp_Data = (unsigned char *)malloc(Real_width)) == NULL) {
    fprintf(stderr,"Error: Memory allocation failed for Bmp_Data!\n");
    exit(1);
- }           
+ }
  
   /* 画像データ読み込み */
   for(i=0;i<imgp->height;i++) {
@@ -129,11 +131,14 @@ void ReadBmp(char *filename, img *imgp) {
     }
   }
 
-  /* 動的に確保した配列領域の解放 */
-  free(Bmp_Data);
-
   /* ファイルクローズ */
   fclose(Bmp_Fp); 
+  
+  unsigned char* ppp = (unsigned char*)malloc(3);
+  free(ppp);
+  
+  /* 動的に確保した配列領域の解放 */
+  free(Bmp_Data);
 }
 
 void WriteBmp(char *filename, img *tp) {
@@ -156,7 +161,7 @@ void WriteBmp(char *filename, img *tp) {
   Real_width = tp->width*3 + tp->width%4;  /* 4byte 境界にあわせるために実際の幅の計算 */
 
   /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
-  if((Bmp_Data = (unsigned char *)calloc(Real_width,sizeof(unsigned char)))==NULL) {
+  if((Bmp_Data = (unsigned char *)malloc(Real_width))==NULL) {
    fprintf(stderr,"Error: Memory allocation failed for Bmp_Data!\n");
    exit(1);
  }
@@ -200,7 +205,7 @@ void WriteBmp(char *filename, img *tp) {
 
   /* 動的に確保した配列領域の解放 */
   free(Bmp_Data);
-
+  
   /* ファイルクローズ */
   fclose(Out_Fp);
 }
@@ -220,12 +225,14 @@ test(...)
 
   img *tmp1;
   
-  tmp1=(img *)malloc(sizeof(img));
   
-  ReadBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog.bmp",tmp1);
-  WriteBmp("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.bmp",tmp1);
+  tmp1=(img *)malloc(sizeof(img));
 
-  outf = fopen("/home/kimoto/labo/Image-PNG-Simple/t/dog_copy.png", "wb");
+  ReadBmp("t/dog.bmp",tmp1);
+
+  WriteBmp("t/dog_copy.bmp",tmp1);
+
+  outf = fopen("t/dog_copy.png", "wb");
   if (!outf)
   {
     croak("Can't open png file for writing");
@@ -244,8 +251,10 @@ test(...)
     croak("Fail png_create_info_struct");
   }
 
+
   lines = NULL;
-  if (sigsetjmp(png_jmpbuf(png), 0)) {
+  
+  if (setjmp(png_jmpbuf(png))) {
     png_destroy_write_struct(png, info);
     if (lines != NULL) {
       free(lines);
@@ -253,7 +262,7 @@ test(...)
     fclose(outf);
     croak("libpng internal error");
   }
-  
+
   png_init_io(png, outf);
 
   png_set_IHDR(png, info, tmp1->width, tmp1->height, 8, 
@@ -278,6 +287,7 @@ test(...)
   png_write_image(png, lines);
   png_write_end(png, info);
   png_destroy_write_struct(&png, &info);
+  
   
   free(lines);
   free(tmp1);
