@@ -7,7 +7,7 @@
 #include "png.h"
 #include <stdio.h>
 
-/* Windows setjmp don't work by Perl default */
+/* Windows setjmp and longjmp don't work by Perl default */
 #ifdef WIN32
 #  undef setjmp
 #  undef longjmp
@@ -44,71 +44,63 @@ typedef struct {                      /* 1ピクセルあたりの赤緑青の�
 typedef struct {
   long height;
   long width;
-  long real_width;
   color data[MAXHEIGHT][MAXWIDTH];
   IV rgb_data[MAXHEIGHT][MAXWIDTH];
-} img;
+} BitmapImage;
 
-void ReadBmp(char *filename, img *imgp);
-void WriteBmp(char *filename, img *tp);
+void ReadBmp(char *filename, BitmapImage *imgp);
+void WriteBmp(char *filename, BitmapImage *tp);
 void PrintBmpInfo(char *filename);
-void HMirror(img *sp, img *tp);
-void VMirror(img *sp, img *tp);
-void Rotate90(int a, img *sp, img *tp);
-void Shrink(int a, img *sp, img *tp);
-void Mosaic(int a, img *sp, img *tp);
-void Gray(img *sp, img *tp);
-void Diminish(img *sp, img *tp, unsigned char x);
+void HMirror(BitmapImage *sp, BitmapImage *tp);
+void VMirror(BitmapImage *sp, BitmapImage *tp);
+void Rotate90(int a, BitmapImage *sp, BitmapImage *tp);
+void Shrink(int a, BitmapImage *sp, BitmapImage *tp);
+void Mosaic(int a, BitmapImage *sp, BitmapImage *tp);
+void Gray(BitmapImage *sp, BitmapImage *tp);
+void Diminish(BitmapImage *sp, BitmapImage *tp, unsigned char x);
 
-/* 
-   関数名: ReadBmp 
-   引数  : char *filename, img *imgp
-   返り値: void
-   動作  : bmp形式のファイル filename を開いて, その画像データを
-           2次元配列 imgp->data に格納する. 同時に, ヘッダから読み込まれた
-           画像の幅と高さをグローバル変数 Bmp_width とBmp_height にセットする. 
-*/
-void ReadBmp(char *filename, img *imgp) {
+// Read bitmap image from file
+void ReadBmp(char *filename, BitmapImage *imgp) {
   int i,j;
   int Real_width;
   int y;
   FILE *Bmp_Fp=fopen(filename,"rb");  /* バイナリモード読み込み用にオープン  */
   unsigned char* Bmp_Data;           /* 画像データを1行分格納               */
 
-  if(Bmp_Fp==NULL){
-    fprintf(stderr,"Error: file %s couldn\'t open for read!.\n",filename);
+  if(Bmp_Fp == NULL){
+    fprintf(stderr,"Error: file %s couldn\'t open for read!.\n", filename);
     exit(1);
   }
   
   /* ヘッダ読み込み */
-  fread(Bmp_headbuf,sizeof(unsigned char),HEADERSIZE,Bmp_Fp);
+  fread(Bmp_headbuf, sizeof(unsigned char), HEADERSIZE, Bmp_Fp);
         
   memcpy(&Bmp_type, Bmp_headbuf, 2);
-  if (strncmp(Bmp_type,"BM",2)!=0) {
-    fprintf(stderr,"Error: %s is not a bmp file.\n",filename);
+  if (strncmp(Bmp_type,"BM",2) != 0) {
+    fprintf(stderr,"Error: %s is not a bmp file.\n", filename);
     exit(1);
   }
   
   memcpy(&imgp->width, Bmp_headbuf+18, 4);
   memcpy(&imgp->height, Bmp_headbuf+22, 4);
   memcpy(&Bmp_color, Bmp_headbuf+28, 2);
-  if (Bmp_color!=24) {
-    fprintf(stderr,"Error: Bmp_color = %d is not implemented in this program.\n",Bmp_color);
+  if (Bmp_color != 24) {
+    fprintf(stderr,"Error: Bmp_color = %d is not implemented in this program.\n", Bmp_color);
     exit(1);
   }
   
   if (imgp->width > MAXWIDTH) {
-    fprintf(stderr,"Error: Bmp_width = %ld > %d = MAXWIDTH!\n",Bmp_width,MAXWIDTH);
+    fprintf(stderr,"Error: Bmp_width = %ld > %d = MAXWIDTH!\n", Bmp_width, MAXWIDTH);
     exit(1);
   }
 
   if (imgp->height > MAXHEIGHT) {
-    fprintf(stderr,"Error: Bmp_height = %ld > %d = MAXHEIGHT!\n",Bmp_height,MAXHEIGHT);
+    fprintf(stderr,"Error: Bmp_height = %ld > %d = MAXHEIGHT!\n", Bmp_height, MAXHEIGHT);
     exit(1);
   }
-    
-  Real_width = imgp->width*3 + imgp->width%4; /* 4byte 境界にあわせるために実際の幅の計算 */
-  imgp->real_width = Real_width;
+
+  /* 4byte 境界にあわせるために実際の幅の計算 */
+  Real_width = imgp->width * 3 + imgp->width % 4; 
 
  /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
  if((Bmp_Data = (unsigned char *)malloc(Real_width)) == NULL) {
@@ -116,37 +108,39 @@ void ReadBmp(char *filename, img *imgp) {
    exit(1);
  }
  
-  /* 画像データ読み込み */
-  for(i=0;i<imgp->height;i++) {
-    fread(Bmp_Data,1,Real_width,Bmp_Fp);
-    for (j=0;j<imgp->width;j++) {
-      imgp->data[imgp->height-i-1][j].r = Bmp_Data[j*3];
-      imgp->data[imgp->height-i-1][j].g = Bmp_Data[j*3+1];
-      imgp->data[imgp->height-i-1][j].b = Bmp_Data[j*3+2];
+  // Read image data
+  for(i=0; i < imgp->height; i++) {
+    fread(Bmp_Data, 1, Real_width, Bmp_Fp);
+    for (j=0; j < imgp->width; j++) {
+      imgp->data[imgp->height - i - 1][j].r = Bmp_Data[j * 3];
+      imgp->data[imgp->height - i - 1][j].g = Bmp_Data[j * 3 + 1];
+      imgp->data[imgp->height - i - 1][j].b = Bmp_Data[j * 3 + 2];
       
-      imgp->rgb_data[imgp->height-i-1][j]
-        = (IV)Bmp_Data[j*3+2] * (16*16) + (IV)Bmp_Data[j*3+1] * (16) + (IV)Bmp_Data[j*3];
+      imgp->rgb_data[imgp->height - i - 1][j]
+        = (IV)Bmp_Data[j * 3 + 2] * (16 * 16) + (IV)Bmp_Data[j * 3 + 1] * (16) + (IV)Bmp_Data[j * 3];
     }
   }
 
-  /* ファイルクローズ */
+  // Close file
   fclose(Bmp_Fp); 
   
-  unsigned char* ppp = (unsigned char*)malloc(3);
-  free(ppp);
-  
-  /* 動的に確保した配列領域の解放 */
+  // Relese memory
   free(Bmp_Data);
 }
 
-void WriteBmp(char *filename, img *tp) {
+// Write bitmap image to file
+void WriteBmp(char *filename, BitmapImage *tp) {
 
   int i,j;
   int Real_width;
-  FILE *Out_Fp = fopen(filename,"wb");  /* ファイルオープン */  
-  unsigned char *Bmp_Data;     /* 画像データを1行分格納               */
   
-  if(Out_Fp==NULL){
+  // Open file
+  FILE *Out_Fp = fopen(filename, "wb");
+
+  // Image one line data
+  unsigned char *Bmp_Data;     
+  
+  if(Out_Fp == NULL){
     fprintf(stderr,"Error: file %s couldn\'t open for write!\n",filename);
     exit(1);
   }
@@ -156,37 +150,39 @@ void WriteBmp(char *filename, img *tp) {
   Bmp_info_header_size=40;
   Bmp_planes=1;
 
-  Real_width = tp->width*3 + tp->width%4;  /* 4byte 境界にあわせるために実際の幅の計算 */
+  /* 4byte 境界にあわせるために実際の幅の計算 */
+  Real_width = tp->width * 3 + tp->width % 4;  
 
   /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
-  if((Bmp_Data = (unsigned char *)malloc(Real_width))==NULL) {
+  if((Bmp_Data = (unsigned char *)malloc(Real_width)) == NULL) {
    fprintf(stderr,"Error: Memory allocation failed for Bmp_Data!\n");
    exit(1);
  }
 
   /* ヘッダ情報の準備 */
-  Bmp_xppm=Bmp_yppm=0;
-  Bmp_image_size = tp->height*Real_width;
-  Bmp_size       = Bmp_image_size + HEADERSIZE;
-  Bmp_headbuf[0]='B'; Bmp_headbuf[1]='M';
-  memcpy(Bmp_headbuf+2,&Bmp_size,sizeof(Bmp_size));
-  Bmp_headbuf[6]=Bmp_headbuf[7]=Bmp_headbuf[8]=Bmp_headbuf[9]=0;
-  memcpy(Bmp_headbuf+10,&Bmp_header_size,sizeof(Bmp_header_size));
-  Bmp_headbuf[11]=Bmp_headbuf[12]=Bmp_headbuf[13]=0;
-  memcpy(Bmp_headbuf+14,&Bmp_info_header_size,sizeof(Bmp_info_header_size)); 
-  Bmp_headbuf[15]=Bmp_headbuf[16]=Bmp_headbuf[17]=0;
-  memcpy(Bmp_headbuf+18,&tp->width,sizeof(Bmp_width));
-  memcpy(Bmp_headbuf+22,&tp->height,sizeof(Bmp_height));
-  memcpy(Bmp_headbuf+26,&Bmp_planes,sizeof(Bmp_planes));
-  memcpy(Bmp_headbuf+28,&Bmp_color,sizeof(Bmp_color));
-  memcpy(Bmp_headbuf+34,&Bmp_image_size,sizeof(Bmp_image_size));
-  memcpy(Bmp_headbuf+38,&Bmp_xppm,sizeof(Bmp_xppm));
-  memcpy(Bmp_headbuf+42,&Bmp_yppm,sizeof(Bmp_yppm));
-  Bmp_headbuf[46]=Bmp_headbuf[47]=Bmp_headbuf[48]=Bmp_headbuf[49]=0;
-  Bmp_headbuf[50]=Bmp_headbuf[51]=Bmp_headbuf[52]=Bmp_headbuf[53]=0;
+  Bmp_xppm=Bmp_yppm = 0;
+  Bmp_image_size = tp->height * Real_width;
+  Bmp_size = Bmp_image_size + HEADERSIZE;
+  Bmp_headbuf[0]='B';
+  Bmp_headbuf[1] = 'M';
+  memcpy(Bmp_headbuf+2, &Bmp_size, sizeof(Bmp_size));
+  Bmp_headbuf[6] = Bmp_headbuf[7] = Bmp_headbuf[8] = Bmp_headbuf[9] = 0;
+  memcpy(Bmp_headbuf+10, &Bmp_header_size, sizeof(Bmp_header_size));
+  Bmp_headbuf[11] = Bmp_headbuf[12] = Bmp_headbuf[13] = 0;
+  memcpy(Bmp_headbuf+14, &Bmp_info_header_size, sizeof(Bmp_info_header_size)); 
+  Bmp_headbuf[15] = Bmp_headbuf[16] = Bmp_headbuf[17]=0;
+  memcpy(Bmp_headbuf+18, &tp->width, sizeof(Bmp_width));
+  memcpy(Bmp_headbuf+22, &tp->height, sizeof(Bmp_height));
+  memcpy(Bmp_headbuf+26, &Bmp_planes, sizeof(Bmp_planes));
+  memcpy(Bmp_headbuf+28, &Bmp_color, sizeof(Bmp_color));
+  memcpy(Bmp_headbuf+34, &Bmp_image_size, sizeof(Bmp_image_size));
+  memcpy(Bmp_headbuf+38, &Bmp_xppm, sizeof(Bmp_xppm));
+  memcpy(Bmp_headbuf+42, &Bmp_yppm, sizeof(Bmp_yppm));
+  Bmp_headbuf[46] = Bmp_headbuf[47] = Bmp_headbuf[48] = Bmp_headbuf[49] = 0;
+  Bmp_headbuf[50] = Bmp_headbuf[51] = Bmp_headbuf[52] = Bmp_headbuf[53] = 0;
   
   /* ヘッダ情報書き出し */
-  fwrite(Bmp_headbuf,sizeof(unsigned char),HEADERSIZE,Out_Fp); 
+  fwrite(Bmp_headbuf, sizeof(unsigned char), HEADERSIZE, Out_Fp); 
 
   /* 画像データ書き出し */
   for (i=0;i<tp->height;i++) {
@@ -195,10 +191,10 @@ void WriteBmp(char *filename, img *tp) {
       Bmp_Data[j*3+1] = tp->data[tp->height-i-1][j].g;
       Bmp_Data[j*3+2] = tp->data[tp->height-i-1][j].b;
     }
-    for (j=tp->width*3;j<Real_width;j++) {
+    for (j=tp->width*3; j<Real_width; j++) {
       Bmp_Data[j]=0;
     }
-    fwrite(Bmp_Data,sizeof(unsigned char),Real_width,Out_Fp);
+    fwrite(Bmp_Data, sizeof(unsigned char), Real_width, Out_Fp);
   }
 
   /* 動的に確保した配列領域の解放 */
@@ -221,10 +217,10 @@ test(...)
   FILE *outf;
   UV y;
 
-  img *tmp1;
+  BitmapImage *tmp1;
   
   
-  tmp1=(img *)malloc(sizeof(img));
+  tmp1=(BitmapImage *)malloc(sizeof(BitmapImage));
 
   ReadBmp("t/dog.bmp",tmp1);
 
