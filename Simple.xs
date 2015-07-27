@@ -7,6 +7,7 @@
 #include "png.h"
 #include <stdio.h>
 
+/* Windows setjmp don't work by Perl default */
 #ifdef WIN32
 #  undef setjmp
 #  undef longjmp
@@ -17,9 +18,6 @@
 #define PALLETSIZE 1024               /* パレットのサイズ                    */
 #define MAXWIDTH   1000               /* 幅(pixel)の上限                     */
 #define MAXHEIGHT  1000               /* 高さ(pixel) の上限                  */
-
-/* x と y の交換のための マクロ関数 */
-#define SWAP(x,y) {typeof(x) temp; temp=x; x=y; y=temp;}
 
 unsigned char Bmp_headbuf[HEADERSIZE];/* ヘッダを格納するための変数          */
 unsigned char Bmp_Pallet[PALLETSIZE]; /* カラーパレットを格納                */
@@ -246,7 +244,7 @@ test(...)
 
   info = png_create_info_struct(png);
   if (info == NULL) {
-    png_destroy_write_struct(png, NULL);
+    png_destroy_write_struct(&png, (png_infopp)NULL);
     fclose(outf);
     croak("Fail png_create_info_struct");
   }
@@ -255,7 +253,7 @@ test(...)
   lines = NULL;
   
   if (setjmp(png_jmpbuf(png))) {
-    png_destroy_write_struct(png, info);
+    png_destroy_write_struct(&png, &info);
     if (lines != NULL) {
       free(lines);
     }
@@ -277,7 +275,7 @@ test(...)
 
   png_write_info(png, info);
   png_set_bgr(png);
-
+  
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
   
   for (y = 0; y < tmp1->height; y++) {
