@@ -26,22 +26,6 @@ __BIG_ENDIAN__
 #define BMP_MAXWIDTH   1000
 #define BMP_MAXHEIGHT  1000
 
-typedef struct {
-  char bmp_type[2];                     /* ファイルタイプ "BM"                 */
-  NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
-  UV bmp_info_header_size; /* 情報ヘッダのサイズ = 40             */
-  UV bmp_header_size;      /* ヘッダサイズ = 54*/
-  UV bmp_height;                      /* 高さ (ピクセル)                     */
-  UV bmp_width;                       /* 幅   (ピクセル)                     */
-  UV bmp_planes;          /* プレーン数 常に 1                   */
-  UV bmp_color;          /* 色 (ビット)     24                  */
-  UV bmp_comp;                        /* 圧縮方法         0                  */
-  UV bmp_image_size;                  /* 画像部分のファイルサイズ (バイト)   */
-  UV bmp_xppm;                        /* 水平解像度 (ppm)                    */
-  UV bmp_yppm;                        /* 垂直解像度 (ppm)                    */
-  
-} BMPInfo;
-
 char bmp_type[2];                     /* ファイルタイプ "BM"                 */
 NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
 UV bmp_info_header_size; /* 情報ヘッダのサイズ = 40             */
@@ -297,13 +281,13 @@ test(...)
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
   
   ICOLOR* rgb_data = malloc(sizeof(ICOLOR) * BmpIO_GetWidth(pBmp) * BmpIO_GetHeight(pBmp));
-  ICOLOR rgb_data2[BMP_MAXWIDTH][BMP_MAXHEIGHT];
+  unsigned char rgb_data2[BMP_MAXHEIGHT][BMP_MAXWIDTH][3];
 
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
     for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].r = BmpIO_GetR(x, y, pBmp);
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].g = BmpIO_GetG(x, y, pBmp);
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].b = BmpIO_GetB(x, y, pBmp);
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][0] = BmpIO_GetB(x, y, pBmp);
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][1] = BmpIO_GetG(x, y, pBmp);
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][2] = BmpIO_GetR(x, y, pBmp);
     }
   }
   
