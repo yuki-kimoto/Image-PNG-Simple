@@ -6,6 +6,7 @@
 
 #include "png.h"
 #include <stdio.h>
+#include "BmpIoLib.h"
 
 /* Windows setjmp and longjmp don't work by Perl default */
 #ifdef WIN32
@@ -228,8 +229,14 @@ test(...)
 
   BMPImage *tmp1;
   
-  
   tmp1=(BMPImage *)malloc(sizeof(BMPImage));
+
+  FILE* infile = fopen("t/dog.bmp", "rb" );
+  if (infile ==  NULL) {
+    croak("Can't open file");
+  }
+  
+  IBMP *pBmp = BmpIO_Load(infile);
 
   ReadBMP("t/dog.bmp",tmp1);
 
