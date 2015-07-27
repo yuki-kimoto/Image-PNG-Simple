@@ -238,6 +238,11 @@ test(...)
   
   IBMP *pBmp = BmpIO_Load(infile);
 
+  fclose( infile );
+  if (pBmp == NULL) {
+    croak("Fail loading bitmap file");
+  }
+
   ReadBMP("t/dog.bmp",tmp1);
 
   WriteBMP("t/dog_copy.bmp",tmp1);
@@ -275,7 +280,7 @@ test(...)
 
   png_init_io(png, outf);
 
-  png_set_IHDR(png, info, tmp1->width, tmp1->height, 8, 
+  png_set_IHDR(png, info, BmpIO_GetWidth(pBmp), BmpIO_GetHeight(pBmp), 8, 
       (bmp_color == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
 
@@ -301,6 +306,7 @@ test(...)
   
   free(lines);
   free(tmp1);
+  BmpIO_DeleteBitmap(pBmp);
   fclose(outf);
 
   XSRETURN(0);
