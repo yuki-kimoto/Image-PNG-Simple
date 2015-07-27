@@ -212,10 +212,6 @@ test(...)
   UV x;
   UV y;
 
-  BMPImage *tmp1;
-  
-  tmp1=(BMPImage *)malloc(sizeof(BMPImage));
-
   FILE* infile = fopen("t/dog.bmp", "rb" );
   if (infile ==  NULL) {
     croak("Can't open input file");
@@ -235,9 +231,6 @@ test(...)
   fclose(outfile);
 
   IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
-
-  ReadBMP("t/dog.bmp",tmp1);
-
   outf = fopen("t/dog_copy.png", "wb");
   if (!outf)
   {
@@ -303,7 +296,6 @@ test(...)
   png_destroy_write_struct(&png, &info);
   
   free(lines);
-  free(tmp1);
   BmpIO_DeleteBitmap(pBmp);
   fclose(outf);
 
