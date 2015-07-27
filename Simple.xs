@@ -124,9 +124,9 @@ void ReadBMP(char *filename, BMPImage *imgp) {
   for(i=0; i < imgp->height; i++) {
     fread(bmp_Data, 1, Real_width, bmp_Fp);
     for (j=0; j < imgp->width; j++) {
-      imgp->data[imgp->height - i - 1][j].r = bmp_Data[j * 3];
+      imgp->data[imgp->height - i - 1][j].b = bmp_Data[j * 3];
       imgp->data[imgp->height - i - 1][j].g = bmp_Data[j * 3 + 1];
-      imgp->data[imgp->height - i - 1][j].b = bmp_Data[j * 3 + 2];
+      imgp->data[imgp->height - i - 1][j].r = bmp_Data[j * 3 + 2];
     }
   }
 
@@ -197,9 +197,9 @@ void WriteBMP(char *filename, BMPImage *tp) {
   /* 画像データ書き出し */
   for (i=0;i<tp->height;i++) {
     for (j=0;j<tp->width;j++) {
-      bmp_Data[j*3]   = tp->data[tp->height-i-1][j].r;
+      bmp_Data[j*3]   = tp->data[tp->height-i-1][j].b;
       bmp_Data[j*3+1] = tp->data[tp->height-i-1][j].g;
-      bmp_Data[j*3+2] = tp->data[tp->height-i-1][j].b;
+      bmp_Data[j*3+2] = tp->data[tp->height-i-1][j].r;
     }
     for (j=tp->width*3; j<Real_width; j++) {
       bmp_Data[j]=0;
@@ -225,6 +225,7 @@ test(...)
   png_color_8 sBIT;
   png_bytep* lines;
   FILE *outf;
+  UV x;
   UV y;
 
   BMPImage *tmp1;
@@ -295,8 +296,19 @@ test(...)
   
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
   
+  ICOLOR* rgb_data = malloc(sizeof(ICOLOR) * BmpIO_GetWidth(pBmp) * BmpIO_GetHeight(pBmp));
+  ICOLOR rgb_data2[BMP_MAXWIDTH][BMP_MAXHEIGHT];
+
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
-    lines[y] = (png_bytep)&(tmp1->data[y]);
+    for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].r = BmpIO_GetR(x, y, pBmp);
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].g = BmpIO_GetG(x, y, pBmp);
+      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x].b = BmpIO_GetB(x, y, pBmp);
+    }
+  }
+  
+  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
+    lines[y] = (png_bytep)&(rgb_data2[y]);
   }
 
   png_write_image(png, lines);
@@ -306,6 +318,7 @@ test(...)
   
   free(lines);
   free(tmp1);
+  free(rgb_data);
   BmpIO_DeleteBitmap(pBmp);
   fclose(outf);
 

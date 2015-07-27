@@ -1,3 +1,6 @@
+/* BmpIoLib.c */
+/* http://www.syuhitu.org/other/bmp/bmp.html */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <malloc.h>
