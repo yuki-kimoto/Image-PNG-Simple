@@ -14,13 +14,20 @@
 #  include <setjmp.h>
 #endif
 
-#define HEADERSIZE   54               /* ヘッダのサイズ 54 = 14 + 40         */
-#define PALLETSIZE 1024               /* パレットのサイズ                    */
-#define MAXWIDTH   1000               /* 幅(pixel)の上限                     */
-#define MAXHEIGHT  1000               /* 高さ(pixel) の上限                  */
+/* BMP header size 54 = 14 + 40 */
+#define BMP_HEADERSIZE   54
 
-unsigned char bmp_headbuf[HEADERSIZE];/* ヘッダを格納するための変数          */
-unsigned char bmp_pallet[PALLETSIZE]; /* カラーパレットを格納                */
+/* BMP pallet size */
+#define BMP_PALLETSIZE 1024
+
+#define BMP_MAXWIDTH   1000
+#define BMP_MAXHEIGHT  1000
+
+/* ヘッダを格納するための変数 */
+unsigned char bmp_headbuf[BMP_HEADERSIZE];
+
+/* カラーパレットを格納 */
+unsigned char bmp_pallet[BMP_PALLETSIZE]; 
 
 char bmp_type[2];                     /* ファイルタイプ "BM"                 */
 NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
@@ -39,24 +46,16 @@ typedef struct {                      /* 1ピクセルあたりの赤緑青の�
   unsigned char r;
   unsigned char g;
   unsigned char b;
-} color;
+} Color;
 
 typedef struct {
   UV height;
   UV width;
-  color data[MAXHEIGHT][MAXWIDTH];
+  Color data[BMP_MAXHEIGHT][BMP_MAXWIDTH];
 } BMPImage;
 
 void ReadBMP(char *filename, BMPImage *imgp);
 void WriteBMP(char *filename, BMPImage *tp);
-void PrintBMPInfo(char *filename);
-void HMirror(BMPImage *sp, BMPImage *tp);
-void VMirror(BMPImage *sp, BMPImage *tp);
-void Rotate90(IV a, BMPImage *sp, BMPImage *tp);
-void Shrink(IV a, BMPImage *sp, BMPImage *tp);
-void Mosaic(IV a, BMPImage *sp, BMPImage *tp);
-void Gray(BMPImage *sp, BMPImage *tp);
-void Diminish(BMPImage *sp, BMPImage *tp, unsigned char x);
 
 // Read bitmap image from file
 void ReadBMP(char *filename, BMPImage *imgp) {
@@ -72,7 +71,7 @@ void ReadBMP(char *filename, BMPImage *imgp) {
   }
   
   /* ヘッダ読み込み */
-  fread(bmp_headbuf, sizeof(unsigned char), HEADERSIZE, bmp_Fp);
+  fread(bmp_headbuf, sizeof(unsigned char), BMP_HEADERSIZE, bmp_Fp);
         
   memcpy(&bmp_type, bmp_headbuf, 2);
   if (strncmp(bmp_type,"BM",2) != 0) {
@@ -88,13 +87,13 @@ void ReadBMP(char *filename, BMPImage *imgp) {
     exit(1);
   }
   
-  if (imgp->width > MAXWIDTH) {
-    fprintf(stderr,"Error: bmp_width = %ld > %d = MAXWIDTH!\n", bmp_width, MAXWIDTH);
+  if (imgp->width > BMP_MAXWIDTH) {
+    fprintf(stderr,"Error: bmp_width = %ld > %d = BMP_MAXWIDTH!\n", bmp_width, BMP_MAXWIDTH);
     exit(1);
   }
 
-  if (imgp->height > MAXHEIGHT) {
-    fprintf(stderr,"Error: bmp_height = %ld > %d = MAXHEIGHT!\n", bmp_height, MAXHEIGHT);
+  if (imgp->height > BMP_MAXHEIGHT) {
+    fprintf(stderr,"Error: bmp_height = %ld > %d = BMP_MAXHEIGHT!\n", bmp_height, BMP_MAXHEIGHT);
     exit(1);
   }
 
@@ -142,7 +141,7 @@ void WriteBMP(char *filename, BMPImage *tp) {
   }
 
   bmp_color=24;
-  bmp_header_size=HEADERSIZE;
+  bmp_header_size=BMP_HEADERSIZE;
   bmp_info_header_size=40;
   bmp_planes=1;
 
@@ -158,7 +157,7 @@ void WriteBMP(char *filename, BMPImage *tp) {
   /* ヘッダ情報の準備 */
   bmp_xppm=bmp_yppm = 0;
   bmp_image_size = tp->height * Real_width;
-  bmp_size = bmp_image_size + HEADERSIZE;
+  bmp_size = bmp_image_size + BMP_HEADERSIZE;
   bmp_headbuf[0]='B';
   bmp_headbuf[1] = 'M';
   memcpy(bmp_headbuf+2, &bmp_size, sizeof(bmp_size));
@@ -178,7 +177,7 @@ void WriteBMP(char *filename, BMPImage *tp) {
   bmp_headbuf[50] = bmp_headbuf[51] = bmp_headbuf[52] = bmp_headbuf[53] = 0;
   
   /* ヘッダ情報書き出し */
-  fwrite(bmp_headbuf, sizeof(unsigned char), HEADERSIZE, Out_Fp); 
+  fwrite(bmp_headbuf, sizeof(unsigned char), BMP_HEADERSIZE, Out_Fp); 
 
   /* 画像データ書き出し */
   for (i=0;i<tp->height;i++) {
