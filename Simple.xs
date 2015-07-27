@@ -14,11 +14,32 @@
 #  include <setjmp.h>
 #endif
 
+/*
+__LITTLE_ENDIAN__
+__BIG_ENDIAN__
+*/
+
 /* BMP header size 54 = 14 + 40 */
 #define BMP_HEADERSIZE   54
 
 #define BMP_MAXWIDTH   1000
 #define BMP_MAXHEIGHT  1000
+
+typedef struct {
+  char bmp_type[2];                     /* ファイルタイプ "BM"                 */
+  NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
+  UV bmp_info_header_size; /* 情報ヘッダのサイズ = 40             */
+  UV bmp_header_size;      /* ヘッダサイズ = 54*/
+  UV bmp_height;                      /* 高さ (ピクセル)                     */
+  UV bmp_width;                       /* 幅   (ピクセル)                     */
+  UV bmp_planes;          /* プレーン数 常に 1                   */
+  UV bmp_color;          /* 色 (ビット)     24                  */
+  UV bmp_comp;                        /* 圧縮方法         0                  */
+  UV bmp_image_size;                  /* 画像部分のファイルサイズ (バイト)   */
+  UV bmp_xppm;                        /* 水平解像度 (ppm)                    */
+  UV bmp_yppm;                        /* 垂直解像度 (ppm)                    */
+  
+} BMPInfo;
 
 char bmp_type[2];                     /* ファイルタイプ "BM"                 */
 NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
