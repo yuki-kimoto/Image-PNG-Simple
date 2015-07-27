@@ -257,7 +257,6 @@ test(...)
     croak("Fail png_create_info_struct");
   }
 
-
   lines = NULL;
   
   if (setjmp(png_jmpbuf(png))) {
@@ -285,8 +284,6 @@ test(...)
   png_set_bgr(png);
   
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
-  
-  ICOLOR* rgb_data = malloc(sizeof(ICOLOR) * BmpIO_GetWidth(pBmp) * BmpIO_GetHeight(pBmp));
   unsigned char rgb_data2[BMP_MAXHEIGHT][BMP_MAXWIDTH][3];
 
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
@@ -307,7 +304,6 @@ test(...)
   
   free(lines);
   free(tmp1);
-  free(rgb_data);
   BmpIO_DeleteBitmap(pBmp);
   fclose(outf);
 
