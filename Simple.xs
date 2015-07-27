@@ -23,17 +23,17 @@ unsigned char Bmp_headbuf[HEADERSIZE];/* ヘッダを格納するための変数
 unsigned char Bmp_Pallet[PALLETSIZE]; /* カラーパレットを格納                */
 
 char Bmp_type[2];                     /* ファイルタイプ "BM"                 */
-unsigned long Bmp_size;               /* bmpファイルのサイズ (バイト)        */
-unsigned int Bmp_info_header_size; /* 情報ヘッダのサイズ = 40             */
-unsigned int Bmp_header_size;      /* ヘッダサイズ = 54*/
-long Bmp_height;                      /* 高さ (ピクセル)                     */
-long Bmp_width;                       /* 幅   (ピクセル)                     */
-unsigned short Bmp_planes;          /* プレーン数 常に 1                   */
-unsigned short Bmp_color;          /* 色 (ビット)     24                  */
-long Bmp_comp;                        /* 圧縮方法         0                  */
-long Bmp_image_size;                  /* 画像部分のファイルサイズ (バイト)   */
-long Bmp_xppm;                        /* 水平解像度 (ppm)                    */
-long Bmp_yppm;                        /* 垂直解像度 (ppm)                    */
+NV Bmp_size;               /* bmpファイルのサイズ (バイト)        */
+UV Bmp_info_header_size; /* 情報ヘッダのサイズ = 40             */
+UV Bmp_header_size;      /* ヘッダサイズ = 54*/
+UV Bmp_height;                      /* 高さ (ピクセル)                     */
+UV Bmp_width;                       /* 幅   (ピクセル)                     */
+UV Bmp_planes;          /* プレーン数 常に 1                   */
+UV Bmp_color;          /* 色 (ビット)     24                  */
+UV Bmp_comp;                        /* 圧縮方法         0                  */
+UV Bmp_image_size;                  /* 画像部分のファイルサイズ (バイト)   */
+UV Bmp_xppm;                        /* 水平解像度 (ppm)                    */
+UV Bmp_yppm;                        /* 垂直解像度 (ppm)                    */
 
 typedef struct {                      /* 1ピクセルあたりの赤緑青の各輝度     */
   unsigned char r;
@@ -42,10 +42,9 @@ typedef struct {                      /* 1ピクセルあたりの赤緑青の�
 } color;
 
 typedef struct {
-  long height;
-  long width;
+  UV height;
+  UV width;
   color data[MAXHEIGHT][MAXWIDTH];
-  IV rgb_data[MAXHEIGHT][MAXWIDTH];
 } BitmapImage;
 
 void ReadBmp(char *filename, BitmapImage *imgp);
@@ -53,17 +52,17 @@ void WriteBmp(char *filename, BitmapImage *tp);
 void PrintBmpInfo(char *filename);
 void HMirror(BitmapImage *sp, BitmapImage *tp);
 void VMirror(BitmapImage *sp, BitmapImage *tp);
-void Rotate90(int a, BitmapImage *sp, BitmapImage *tp);
-void Shrink(int a, BitmapImage *sp, BitmapImage *tp);
-void Mosaic(int a, BitmapImage *sp, BitmapImage *tp);
+void Rotate90(IV a, BitmapImage *sp, BitmapImage *tp);
+void Shrink(IV a, BitmapImage *sp, BitmapImage *tp);
+void Mosaic(IV a, BitmapImage *sp, BitmapImage *tp);
 void Gray(BitmapImage *sp, BitmapImage *tp);
 void Diminish(BitmapImage *sp, BitmapImage *tp, unsigned char x);
 
 // Read bitmap image from file
 void ReadBmp(char *filename, BitmapImage *imgp) {
-  int i,j;
-  int Real_width;
-  int y;
+  IV i,j;
+  IV Real_width;
+  IV y;
   FILE *Bmp_Fp=fopen(filename,"rb");  /* バイナリモード読み込み用にオープン  */
   unsigned char* Bmp_Data;           /* 画像データを1行分格納               */
 
@@ -115,9 +114,6 @@ void ReadBmp(char *filename, BitmapImage *imgp) {
       imgp->data[imgp->height - i - 1][j].r = Bmp_Data[j * 3];
       imgp->data[imgp->height - i - 1][j].g = Bmp_Data[j * 3 + 1];
       imgp->data[imgp->height - i - 1][j].b = Bmp_Data[j * 3 + 2];
-      
-      imgp->rgb_data[imgp->height - i - 1][j]
-        = (IV)Bmp_Data[j * 3 + 2] * (16 * 16) + (IV)Bmp_Data[j * 3 + 1] * (16) + (IV)Bmp_Data[j * 3];
     }
   }
 
@@ -131,8 +127,8 @@ void ReadBmp(char *filename, BitmapImage *imgp) {
 // Write bitmap image to file
 void WriteBmp(char *filename, BitmapImage *tp) {
 
-  int i,j;
-  int Real_width;
+  IV i,j;
+  IV Real_width;
   
   // Open file
   FILE *Out_Fp = fopen(filename, "wb");
