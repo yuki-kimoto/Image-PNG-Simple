@@ -293,9 +293,9 @@ test(...)
   png_write_info(png, info);
   png_set_bgr(png);
   
-  lines = (png_bytep *)malloc(sizeof(png_bytep *) * tmp1->height);
+  lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
   
-  for (y = 0; y < tmp1->height; y++) {
+  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
     lines[y] = (png_bytep)&(tmp1->data[y]);
   }
 
