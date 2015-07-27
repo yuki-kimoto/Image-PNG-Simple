@@ -17,17 +17,8 @@
 /* BMP header size 54 = 14 + 40 */
 #define BMP_HEADERSIZE   54
 
-/* BMP pallet size */
-#define BMP_PALLETSIZE 1024
-
 #define BMP_MAXWIDTH   1000
 #define BMP_MAXHEIGHT  1000
-
-/* ヘッダを格納するための変数 */
-unsigned char bmp_headbuf[BMP_HEADERSIZE];
-
-/* カラーパレットを格納 */
-unsigned char bmp_pallet[BMP_PALLETSIZE]; 
 
 char bmp_type[2];                     /* ファイルタイプ "BM"                 */
 NV bmp_size;               /* bmpファイルのサイズ (バイト)        */
@@ -71,6 +62,7 @@ void ReadBMP(char *filename, BMPImage *imgp) {
   }
   
   /* ヘッダ読み込み */
+  unsigned char bmp_headbuf[BMP_HEADERSIZE];
   fread(bmp_headbuf, sizeof(unsigned char), BMP_HEADERSIZE, bmp_Fp);
         
   memcpy(&bmp_type, bmp_headbuf, 2);
@@ -140,22 +132,23 @@ void WriteBMP(char *filename, BMPImage *tp) {
     exit(1);
   }
 
-  bmp_color=24;
-  bmp_header_size=BMP_HEADERSIZE;
-  bmp_info_header_size=40;
-  bmp_planes=1;
+  bmp_color = 24;
+  bmp_header_size = BMP_HEADERSIZE;
+  bmp_info_header_size = 40;
+  bmp_planes = 1;
 
   /* 4byte 境界にあわせるために実際の幅の計算 */
   Real_width = tp->width * 3 + tp->width % 4;  
 
   /* 配列領域の動的確保. 失敗した場合はエラーメッセージを出力して終了 */
   if((bmp_Data = (unsigned char *)malloc(Real_width)) == NULL) {
-   fprintf(stderr,"Error: Memory allocation failed for bmp_Data!\n");
+   fprintf(stderr, "Error: Memory allocation failed for bmp_Data!\n");
    exit(1);
  }
 
   /* ヘッダ情報の準備 */
-  bmp_xppm=bmp_yppm = 0;
+  unsigned char bmp_headbuf[BMP_HEADERSIZE];
+  bmp_xppm = bmp_yppm = 0;
   bmp_image_size = tp->height * Real_width;
   bmp_size = bmp_image_size + BMP_HEADERSIZE;
   bmp_headbuf[0]='B';
