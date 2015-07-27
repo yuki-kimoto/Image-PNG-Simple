@@ -218,19 +218,25 @@ test(...)
 
   FILE* infile = fopen("t/dog.bmp", "rb" );
   if (infile ==  NULL) {
-    croak("Can't open file");
+    croak("Can't open input file");
   }
   
   IBMP *pBmp = BmpIO_Load(infile);
-
   fclose( infile );
   if (pBmp == NULL) {
     croak("Fail loading bitmap file");
   }
+  
+  FILE* outfile = fopen("t/dog_copy.bmp", "wb" );
+  if (outfile ==  NULL) {
+    croak("Can't open output file");
+  }
+  BmpIO_Save(outfile, pBmp);
+  fclose(outfile);
+
+  IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
 
   ReadBMP("t/dog.bmp",tmp1);
-
-  WriteBMP("t/dog_copy.bmp",tmp1);
 
   outf = fopen("t/dog_copy.png", "wb");
   if (!outf)
@@ -266,13 +272,13 @@ test(...)
   png_init_io(png, outf);
 
   png_set_IHDR(png, info, BmpIO_GetWidth(pBmp), BmpIO_GetHeight(pBmp), 8, 
-      (bmp_color == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
+      (bit_per_pixcel == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
 
   sBIT.red = 8;
   sBIT.green = 8;
   sBIT.blue = 8;
-  sBIT.alpha = (png_byte)(bmp_color == 32 ? 8 : 0);
+  sBIT.alpha = (png_byte)(bit_per_pixcel == 32 ? 8 : 0);
   png_set_sBIT(png, info, &sBIT);
 
   png_write_info(png, info);
@@ -298,7 +304,6 @@ test(...)
   png_write_image(png, lines);
   png_write_end(png, info);
   png_destroy_write_struct(&png, &info);
-  
   
   free(lines);
   free(tmp1);
