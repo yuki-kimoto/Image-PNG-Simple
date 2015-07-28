@@ -6,7 +6,7 @@
 #include <malloc.h>
 #include <assert.h>
 
-#if !defined( _MSC_VER )
+#if !defined( _MSC_VER ) && !defined(__MINGW32__) // Changed
 #include <alloca.h>
 #endif
 
