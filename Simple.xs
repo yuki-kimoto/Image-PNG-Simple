@@ -102,7 +102,7 @@ test(...)
   png_set_bgr(png);
   
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
-  unsigned char rgb_data2[BMP_MAXHEIGHT][BMP_MAXWIDTH][3];
+  unsigned char rgb_data2[BMP_MAXHEIGHT][BMP_MAXWIDTH][3] = {0};
 
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
     for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
