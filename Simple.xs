@@ -20,8 +20,8 @@ __LITTLE_ENDIAN__
 __BIG_ENDIAN__
 */
 
-#define BMP_MAXWIDTH   1000
-#define BMP_MAXHEIGHT  1000
+#define BMP_MAXWIDTH   500
+#define BMP_MAXHEIGHT  500
 
 MODULE = Image::PNG::Simple PACKAGE = Image::PNG::Simple
 
