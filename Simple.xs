@@ -20,9 +20,6 @@ __LITTLE_ENDIAN__
 __BIG_ENDIAN__
 */
 
-#define BMP_MAXWIDTH   500
-#define BMP_MAXHEIGHT  500
-
 MODULE = Image::PNG::Simple PACKAGE = Image::PNG::Simple
 
 SV
@@ -102,18 +99,18 @@ test(...)
   png_set_bgr(png);
   
   lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
-  unsigned char rgb_data2[BMP_MAXHEIGHT][BMP_MAXWIDTH][3] = {0};
+  unsigned char* rgb_data = malloc(BmpIO_GetHeight(pBmp) * BmpIO_GetWidth(pBmp) * 3);
 
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
     for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][0] = BmpIO_GetB(x, y, pBmp);
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][1] = BmpIO_GetG(x, y, pBmp);
-      rgb_data2[BmpIO_GetHeight(pBmp) - y - 1][x][2] = BmpIO_GetR(x, y, pBmp);
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3)] = BmpIO_GetB(x, y, pBmp);
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 1] = BmpIO_GetG(x, y, pBmp);
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 2] = BmpIO_GetR(x, y, pBmp);
     }
   }
   
   for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
-    lines[y] = (png_bytep)&(rgb_data2[y]);
+    lines[y] = (png_bytep)&(rgb_data[y * BmpIO_GetWidth(pBmp) * 3]);
   }
 
   png_write_image(png, lines);
@@ -121,6 +118,7 @@ test(...)
   png_destroy_write_struct(&png, &info);
   
   free(lines);
+  free(rgb_data);
   BmpIO_DeleteBitmap(pBmp);
   fclose(outf);
 
