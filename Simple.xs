@@ -34,8 +34,8 @@ test(...)
   png_color_8 sBIT;
   png_bytep* lines;
   FILE *outf;
-  UV x;
-  UV y;
+  IV x;
+  IV y;
 
   FILE* infile = fopen("t/dog.bmp", "rb" );
   if (infile ==  NULL) {
