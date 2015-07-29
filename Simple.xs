@@ -110,9 +110,8 @@ write_bmp(...)
   char* file = SvPV_nolen(sv_file);
   FILE* outfile = fopen(file, "wb" );
   if (outfile ==  NULL) {
-    croak("Can't open bitmap file");
-  }
-  
+    croak("Can't open file %s for writing", file);
+  }  
   BmpIO_Save(outfile, ips->pBmp);
 
   XSRETURN(0);
@@ -126,6 +125,95 @@ write_png(...)
   SV* ips_sv = SvROK(ips_obj) ? SvRV(ips_obj) : ips_obj;
   size_t ips_iv = SvIV(ips_sv);
   ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
+
+  // Bitmap information
+  IBMP* pBmp = ips->pBmp;
+
+  // Not exists bitmap data
+  if (ips->pBmp == NULL) {
+    croak("Can't write bitmap because bitmap data is not loaded");
+  }
+    
+  // Open file for write
+  SV* sv_file = ST(1);
+  char* file = SvPV_nolen(sv_file);
+  FILE* outfile = fopen(file, "wb" );
+  if (outfile ==  NULL) {
+    croak("Can't open file %s for writing", file);
+  }
+  
+  // PNG information
+  png_structp png;
+  png_infop info;
+  png_color_8 sBIT;
+  png_bytep* lines;
+  IV x;
+  IV y;
+
+  IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
+  png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  if (png == NULL)
+  {
+    fclose(outfile);
+    croak("Fail png_create_write_struct");
+  }
+
+  info = png_create_info_struct(png);
+  if (info == NULL) {
+    png_destroy_write_struct(&png, (png_infopp)NULL);
+    fclose(outfile);
+    croak("Fail png_create_info_struct");
+  }
+
+  lines = NULL;
+  
+  if (setjmp(png_jmpbuf(png))) {
+    png_destroy_write_struct(&png, &info);
+    if (lines != NULL) {
+      free(lines);
+    }
+    fclose(outfile);
+    croak("libpng internal error");
+  }
+
+  png_init_io(png, outfile);
+
+  png_set_IHDR(png, info, BmpIO_GetWidth(pBmp), BmpIO_GetHeight(pBmp), 8, 
+      (bit_per_pixcel == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
+      PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
+
+  sBIT.red = 8;
+  sBIT.green = 8;
+  sBIT.blue = 8;
+  sBIT.alpha = (png_byte)(bit_per_pixcel == 32 ? 8 : 0);
+  png_set_sBIT(png, info, &sBIT);
+
+  png_write_info(png, info);
+  png_set_bgr(png);
+  
+  lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
+  unsigned char* rgb_data = malloc(BmpIO_GetHeight(pBmp) * BmpIO_GetWidth(pBmp) * 3);
+
+  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
+    for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3)] = BmpIO_GetB(x, y, pBmp);
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 1] = BmpIO_GetG(x, y, pBmp);
+      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 2] = BmpIO_GetR(x, y, pBmp);
+    }
+  }
+  
+  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
+    lines[y] = (png_bytep)&(rgb_data[y * BmpIO_GetWidth(pBmp) * 3]);
+  }
+
+  png_write_image(png, lines);
+  png_write_end(png, info);
+  png_destroy_write_struct(&png, &info);
+  
+  free(lines);
+  free(rgb_data);
+  BmpIO_DeleteBitmap(pBmp);
+  fclose(outfile);
 
   XSRETURN(0);
 }
