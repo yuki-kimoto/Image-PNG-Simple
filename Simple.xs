@@ -143,30 +143,27 @@ write_png(...)
   }
   
   // PNG information
-  png_structp png;
-  png_infop info;
-  png_color_8 sBIT;
-  png_bytep* lines;
   IV x;
   IV y;
-
-  IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
-  png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+  
+  // Create png write struct
+  png_structp png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (png == NULL)
   {
     fclose(out_fh);
     croak("Fail png_create_write_struct");
   }
-
-  info = png_create_info_struct(png);
+  
+  // Create png information
+  png_infop info = png_create_info_struct(png);
   if (info == NULL) {
     png_destroy_write_struct(&png, (png_infopp)NULL);
     fclose(out_fh);
     croak("Fail png_create_info_struct");
   }
-
-  lines = NULL;
   
+  // Set png error callback
+  png_bytep* lines = NULL;
   if (setjmp(png_jmpbuf(png))) {
     png_destroy_write_struct(&png, &info);
     if (lines != NULL) {
@@ -175,41 +172,54 @@ write_png(...)
     fclose(out_fh);
     croak("libpng internal error");
   }
-
+  
+  // Initialize png IO
   png_init_io(png, out_fh);
-
-  png_set_IHDR(png, info, BmpIO_GetWidth(pBmp), BmpIO_GetHeight(pBmp), 8, 
+  
+  // Image width
+  IV bmp_height = BmpIO_GetHeight(pBmp);
+  
+  // Image height
+  IV bmp_width = BmpIO_GetWidth(pBmp);
+  
+  // Set png IHDR
+  IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
+  png_set_IHDR(png, info, bmp_width, bmp_height, 8, 
       (bit_per_pixcel == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
       PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_BASE);
 
+  // Set png sbit
+  png_color_8 sBIT;
   sBIT.red = 8;
   sBIT.green = 8;
   sBIT.blue = 8;
   sBIT.alpha = (png_byte)(bit_per_pixcel == 32 ? 8 : 0);
   png_set_sBIT(png, info, &sBIT);
-
+  
+  // Write png information
   png_write_info(png, info);
+  
+  // Set png bgr
   png_set_bgr(png);
   
-  lines = (png_bytep *)malloc(sizeof(png_bytep *) * BmpIO_GetHeight(pBmp));
-  unsigned char* rgb_data = malloc(BmpIO_GetHeight(pBmp) * BmpIO_GetWidth(pBmp) * 3);
-
-  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
-    for (x = 0; x < BmpIO_GetWidth(pBmp); x++) {
-      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3)] = BmpIO_GetB(x, y, pBmp);
-      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 1] = BmpIO_GetG(x, y, pBmp);
-      rgb_data[((BmpIO_GetHeight(pBmp) - y - 1) * BmpIO_GetWidth(pBmp) * 3) + (x * 3) + 2] = BmpIO_GetR(x, y, pBmp);
+  // Set png lines
+  unsigned char* rgb_data = malloc(bmp_height * bmp_width * 3);
+  lines = (png_bytep *)malloc(sizeof(png_bytep *) * bmp_height);
+  for (y = 0; y < bmp_height; y++) {
+    for (x = 0; x < bmp_width; x++) {
+      rgb_data[((bmp_height - y - 1) * bmp_width * 3) + (x * 3)] = BmpIO_GetB(x, y, pBmp);
+      rgb_data[((bmp_height - y - 1) * bmp_width * 3) + (x * 3) + 1] = BmpIO_GetG(x, y, pBmp);
+      rgb_data[((bmp_height - y - 1) * bmp_width * 3) + (x * 3) + 2] = BmpIO_GetR(x, y, pBmp);
     }
+    lines[y] = (png_bytep)&(rgb_data[y * bmp_width * 3]);
   }
   
-  for (y = 0; y < BmpIO_GetHeight(pBmp); y++) {
-    lines[y] = (png_bytep)&(rgb_data[y * BmpIO_GetWidth(pBmp) * 3]);
-  }
-
+  // Write png image
   png_write_image(png, lines);
   png_write_end(png, info);
   png_destroy_write_struct(&png, &info);
   
+  // Release resource
   free(lines);
   free(rgb_data);
   BmpIO_DeleteBitmap(pBmp);
