@@ -11,8 +11,6 @@ XSLoader::load('Image::PNG::Simple', $VERSION);
 
 1;
 
-__END__
-
 =head1 NAME
 
 Image::PNG::Simple - Convert bitmap file to png file without C library dependency.
@@ -60,6 +58,11 @@ Write bitmap file.
 
 Write png file.
 
+=head1 INTERNAL
+
+This module internally use libpng-1.6.17 and zlib-1.2.8.
+So This module license follow Perl license, libpng license and zlib license.
+
 =head1 SEE ALSO
 
 L<Image::PNG>, L<Imager::File::PNG>, L<Image::PNG::Libpng>
@@ -73,7 +76,7 @@ Yuki Kimoto E<lt>kimoto.yuki@gmail.comE<gt>
 Copyright (C) 2015 by Yuki Kimoto
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.16.3 or,
+it under the same terms as Perl, libpng, and zlib itself, either Perl version 5.16.3 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
