@@ -1,86 +1,79 @@
 package Image::PNG::Simple;
 
-use 5.016003;
+use 5.00807;
 use strict;
 use warnings;
-
-require Exporter;
-
-our @ISA = qw(Exporter);
-
-# Items to export into callers namespace by default. Note: do not export
-# names by default without a very good reason. Use EXPORT_OK instead.
-# Do not simply export all your public functions/methods/constants.
-
-# This allows declaration	use Image::PNG::Simple ':all';
-# If you do not need this, moving things directly into @EXPORT or @EXPORT_OK
-# will save memory.
-our %EXPORT_TAGS = ( 'all' => [ qw(
-	
-) ] );
-
-our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
-
-our @EXPORT = qw(
-	
-);
 
 our $VERSION = '0.01';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
 
-# Preloaded methods go here.
-
 1;
+
 __END__
-# Below is stub documentation for your module. You'd better edit it!
 
 =head1 NAME
 
-Image::PNG::Simple - Perl extension for blah blah blah
+Image::PNG::Simple - Convert bitmap file to png file without C library dependency.
 
 =head1 SYNOPSIS
 
   use Image::PNG::Simple;
-  blah blah blah
+  
+  # Create Image::PNG::Simple object
+  my $ips = Image::PNG::Simple->new;
+  
+  # Read bitmap file
+  $ips->read_bmp('dog.bmp');
+  
+  # Write png file
+  $ips->write_png('dog.png');
 
 =head1 DESCRIPTION
 
-Stub documentation for Image::PNG::Simple, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
+Convert bitmap file to png file without C library dependency.
 
-Blah blah blah.
+=head1 METHODS
 
-=head2 EXPORT
+=head2 new
 
-None by default.
+  my $ips = Image::PNG::Simple->new;
 
+Create new Image::PNG::Simple object.
 
+=head2 read_bmp
+
+  $ips->read_bmp('dog.bmp');
+
+Read bitmap file.
+
+=head2 write_bmp
+
+  $ips->write_bmp('dog_copy.bmp');
+
+Write bitmap file.
+
+=head2 write_png
+
+  $ips->write_png('dog.png');
+
+Write png file.
 
 =head1 SEE ALSO
 
-Mention other useful documentation such as the documentation of
-related modules or operating system documentation (such as man pages
-in UNIX), or any relevant external documentation such as RFCs or
-standards.
-
-If you have a mailing list set up for your module, mention it here.
-
-If you have a web site set up for your module, mention it here.
+L<Image::PNG>, L<Imager::File::PNG>, L<Image::PNG::Libpng>
 
 =head1 AUTHOR
 
-A. U. Thor, E<lt>kimoto@sakura.ne.jpE<gt>
+Yuki Kimoto E<lt>kimoto.yuki@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015 by A. U. Thor
+Copyright (C) 2015 by Yuki Kimoto
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.16.3 or,
 at your option, any later version of Perl 5 you may have available.
-
 
 =cut
