@@ -20,7 +20,69 @@ __LITTLE_ENDIAN__
 __BIG_ENDIAN__
 */
 
+typedef struct {
+  IBMP* pBmp;
+} ImagePNGSimple;
+
 MODULE = Image::PNG::Simple PACKAGE = Image::PNG::Simple
+
+SV
+new(...)
+  PPCODE:
+{
+  char* class_name = SvPV_nolen(ST(0));
+  
+  ImagePNGSimple* ips = (ImagePNGSimple*)malloc(sizeof(ImagePNGSimple));
+  
+  size_t ips_iv = PTR2IV(ips);
+  
+  SV* ips_sv = sv_2mortal(newSViv(ips_iv));
+  
+  SV* ips_svrv = sv_2mortal(newRV_inc(ips_sv));
+  
+  SV* ips_obj = sv_bless(ips_svrv, gv_stashpv(class_name, 1));
+  
+  XPUSHs(ips_obj);
+  XSRETURN(1);
+}
+
+SV
+DESTORY(...)
+  PPCODE:
+{
+  SV* ips_obj = ST(0);
+  SV* ips_sv = SvROK(ips_obj) ? SvRV(ips_obj) : ips_obj;
+  size_t ips_iv = SvIV(ips_sv);
+  ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
+  
+  if (ips->pBmp != NULL) {
+    free(ips->pBmp);
+  }
+  free(ips);
+  
+  XSRETURN(0);
+}
+
+SV
+read_bmp(...)
+  PPCODE :
+{
+  XSRETURN(0);
+}
+
+SV
+write_bmp(...)
+  PPCODE:
+{
+  XSRETURN(0);
+}
+
+SV
+write_png(...)
+  PPCODE:
+{
+  XSRETURN(0);
+}
 
 SV
 test(...)
