@@ -20,4 +20,5 @@ Image::PNG::Simple::test();
 
 my $ips = Image::PNG::Simple->new;
 $ips->read_bmp('t/dog.bmp');
+$ips->write_bmp('t/dog_copy.bmp');
 

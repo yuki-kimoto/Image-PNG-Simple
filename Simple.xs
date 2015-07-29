@@ -100,6 +100,21 @@ write_bmp(...)
   size_t ips_iv = SvIV(ips_sv);
   ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
 
+  // Not exists bitmap data
+  if (ips->pBmp == NULL) {
+    croak("Can't write bitmap because bitmap data is not loaded");
+  }
+    
+  // Open file for write
+  SV* sv_file = ST(1);
+  char* file = SvPV_nolen(sv_file);
+  FILE* outfile = fopen(file, "wb" );
+  if (outfile ==  NULL) {
+    croak("Can't open bitmap file");
+  }
+  
+  BmpIO_Save(outfile, ips->pBmp);
+
   XSRETURN(0);
 }
 
@@ -137,13 +152,6 @@ test(...)
   if (pBmp == NULL) {
     croak("Fail loading bitmap file");
   }
-  
-  FILE* outfile = fopen("t/dog_copy.bmp", "wb" );
-  if (outfile ==  NULL) {
-    croak("Can't open output file");
-  }
-  BmpIO_Save(outfile, pBmp);
-  fclose(outfile);
 
   IV bit_per_pixcel = BmpIO_GetBitPerPixcel(pBmp);
   outf = fopen("t/dog_copy.png", "wb");
