@@ -67,6 +67,27 @@ SV
 read_bmp(...)
   PPCODE :
 {
+  SV* ips_obj = ST(0);
+  SV* ips_sv = SvROK(ips_obj) ? SvRV(ips_obj) : ips_obj;
+  size_t ips_iv = SvIV(ips_sv);
+  ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
+  
+  // Open bitmap file
+  SV* sv_file = ST(1);
+  char* file = SvPV_nolen(sv_file);
+  FILE* infile = fopen(file, "rb");
+  if (infile ==  NULL) {
+    croak("Can't open bitmap file %s", file);
+  }
+  
+  // Create bitmap data
+  IBMP *pBmp = BmpIO_Load(infile);
+  fclose(infile);
+  if (pBmp == NULL) {
+    croak("Can't parse bitmap file %s", file);
+  }
+  ips->pBmp = pBmp;
+  
   XSRETURN(0);
 }
 
@@ -74,6 +95,11 @@ SV
 write_bmp(...)
   PPCODE:
 {
+  SV* ips_obj = ST(0);
+  SV* ips_sv = SvROK(ips_obj) ? SvRV(ips_obj) : ips_obj;
+  size_t ips_iv = SvIV(ips_sv);
+  ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
+
   XSRETURN(0);
 }
 
@@ -81,6 +107,11 @@ SV
 write_png(...)
   PPCODE:
 {
+  SV* ips_obj = ST(0);
+  SV* ips_sv = SvROK(ips_obj) ? SvRV(ips_obj) : ips_obj;
+  size_t ips_iv = SvIV(ips_sv);
+  ImagePNGSimple* ips = INT2PTR(ImagePNGSimple*, ips_iv);
+
   XSRETURN(0);
 }
 

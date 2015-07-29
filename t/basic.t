@@ -17,3 +17,7 @@ BEGIN { use_ok('Image::PNG::Simple') };
 # its man page ( perldoc Test::More ) for help writing this test script.
 
 Image::PNG::Simple::test();
+
+my $ips = Image::PNG::Simple->new;
+$ips->read_bmp('t/dog.bmp');
+
