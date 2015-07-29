@@ -75,14 +75,14 @@ read_bmp(...)
   // Open bitmap file
   SV* sv_file = ST(1);
   char* file = SvPV_nolen(sv_file);
-  FILE* infile = fopen(file, "rb");
-  if (infile ==  NULL) {
+  FILE* in_fh = fopen(file, "rb");
+  if (in_fh ==  NULL) {
     croak("Can't open bitmap file %s", file);
   }
   
   // Create bitmap data
-  IBMP *pBmp = BmpIO_Load(infile);
-  fclose(infile);
+  IBMP *pBmp = BmpIO_Load(in_fh);
+  fclose(in_fh);
   if (pBmp == NULL) {
     croak("Can't parse bitmap file %s", file);
   }
@@ -108,11 +108,11 @@ write_bmp(...)
   // Open file for write
   SV* sv_file = ST(1);
   char* file = SvPV_nolen(sv_file);
-  FILE* outfile = fopen(file, "wb" );
-  if (outfile ==  NULL) {
+  FILE* out_fh = fopen(file, "wb" );
+  if (out_fh ==  NULL) {
     croak("Can't open file %s for writing", file);
   }  
-  BmpIO_Save(outfile, ips->pBmp);
+  BmpIO_Save(out_fh, ips->pBmp);
 
   XSRETURN(0);
 }
@@ -137,8 +137,8 @@ write_png(...)
   // Open file for write
   SV* sv_file = ST(1);
   char* file = SvPV_nolen(sv_file);
-  FILE* outfile = fopen(file, "wb" );
-  if (outfile ==  NULL) {
+  FILE* out_fh = fopen(file, "wb" );
+  if (out_fh ==  NULL) {
     croak("Can't open file %s for writing", file);
   }
   
@@ -154,14 +154,14 @@ write_png(...)
   png = png_create_write_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
   if (png == NULL)
   {
-    fclose(outfile);
+    fclose(out_fh);
     croak("Fail png_create_write_struct");
   }
 
   info = png_create_info_struct(png);
   if (info == NULL) {
     png_destroy_write_struct(&png, (png_infopp)NULL);
-    fclose(outfile);
+    fclose(out_fh);
     croak("Fail png_create_info_struct");
   }
 
@@ -172,11 +172,11 @@ write_png(...)
     if (lines != NULL) {
       free(lines);
     }
-    fclose(outfile);
+    fclose(out_fh);
     croak("libpng internal error");
   }
 
-  png_init_io(png, outfile);
+  png_init_io(png, out_fh);
 
   png_set_IHDR(png, info, BmpIO_GetWidth(pBmp), BmpIO_GetHeight(pBmp), 8, 
       (bit_per_pixcel == 32 ? PNG_COLOR_TYPE_RGB_ALPHA : PNG_COLOR_TYPE_RGB),
@@ -213,7 +213,7 @@ write_png(...)
   free(lines);
   free(rgb_data);
   BmpIO_DeleteBitmap(pBmp);
-  fclose(outfile);
+  fclose(out_fh);
 
   XSRETURN(0);
 }
