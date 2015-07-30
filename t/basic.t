@@ -38,9 +38,13 @@ BEGIN { use_ok('Image::PNG::Simple') };
     binmode($fh);
     read($fh, $dog_copy_bmp_expected, -s $dog_copy_bmp_file); 
   }
+  if ($dog_copy_bmp eq $dog_copy_bmp_expected) {
+    pass('Compare dog_copy.bmp');
+  }
+  else {
+    fail('Compare dog_copy.bmp');
+  }
   
-  is($dog_copy_bmp, $dog_copy_bmp_expected);
-
   my $dog_copy_png;
   {
     open my $fh, '<', $dog_copy_png_file
@@ -57,7 +61,10 @@ BEGIN { use_ok('Image::PNG::Simple') };
     binmode($fh);
     read($fh, $dog_copy_png_expected, -s $dog_copy_png_expected_file); 
   }
-  is($dog_copy_png, $dog_copy_png_expected);
-
-  1;
+  if ($dog_copy_png eq $dog_copy_png_expected) {
+    pass('Compare dog_copy.png');
+  }
+  else {
+    fail('Compare dog_copy.png');
+  }
 }
