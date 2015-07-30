@@ -12,8 +12,13 @@
 
 #include "BmpIoLib.h"
 
-// リトルエンディアンか否か
-#define ISLITTLEENDIAN 1
+// Changed
+// __BIG_ENDIAN__ or __LITTLE_ENDIAN__ 
+#if defined(__BIG_ENDIAN__)
+#  define ISLITTLEENDIAN 0
+#else
+#  define ISLITTLEENDIAN 1
+#endif
 
 // 各種データ型
 

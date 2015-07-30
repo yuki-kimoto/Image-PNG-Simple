@@ -6,6 +6,7 @@
 
 #include "png.h"
 #include <stdio.h>
+
 #include "BmpIoLib.h"
 
 /* Windows setjmp and longjmp don't work by Perl default */
@@ -14,11 +15,6 @@
 #  undef longjmp
 #  include <setjmp.h>
 #endif
-
-/*
-__LITTLE_ENDIAN__
-__BIG_ENDIAN__
-*/
 
 typedef struct {
   IBMP* pBmp;
