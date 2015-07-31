@@ -14,6 +14,9 @@
 #  undef setjmp
 #  undef longjmp
 #  include <setjmp.h>
+#  if defined(__MINGW32_VERSION)
+#    define setjmp(x) _setjmp(x)
+#  endif
 #endif
 
 typedef struct {
