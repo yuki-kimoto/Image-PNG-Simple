@@ -1,6 +1,6 @@
 Revision history for Perl extension Image::PNG::Simple.
 
-0.01  Thu Jul 23 20:49:43 2015
-	- original version; created by h2xs 1.23 with options
-		-A -n Image::PNG::Simple
-
+0.02 (2015-08-01)
+  - fix FreeBSD and Active Perl don't work bug.
+0.01 (2015-07-23)
+  - first release
