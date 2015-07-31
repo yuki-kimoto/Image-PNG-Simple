@@ -16,6 +16,8 @@ MYMETA.json
 *.bs
 core.*
 
+dll.base
+dll.exp
 Simple.def
 Simple.c
 adler32.c

@@ -10,7 +10,7 @@
 #include "BmpIoLib.h"
 
 /* Windows setjmp and longjmp don't work by Perl default */
-#ifdef WIN32
+#if defined(WIN32) || defined(_MSC_VER)
 #  undef setjmp
 #  undef longjmp
 #  include <setjmp.h>
