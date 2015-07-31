@@ -3,12 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <malloc.h>
 #include <assert.h>
-
-#if !defined( _MSC_VER ) && !defined(__MINGW32__) // Changed
-#include <alloca.h>
-#endif
 
 #include "BmpIoLib.h"
 
@@ -721,7 +716,7 @@ size_t int_fwrite( const void *buffer, size_t size, size_t count, FILE *stream )
 #else
 	size_t i, j;
 	char *cbuf = (char*)buffer;
-	char *wbuf = (char*)alloca( size );
+	char *wbuf = (char*)malloc( size );
 	size_t r;
 
 	// 1バイト単位ならば、反転する必要はない
@@ -740,6 +735,9 @@ size_t int_fwrite( const void *buffer, size_t size, size_t count, FILE *stream )
 			return r;
 		r++;
 	}
+	
+	free(wbuf);
+	
 	return r;
 #endif
 }

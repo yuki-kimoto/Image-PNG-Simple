@@ -16,6 +16,7 @@ MYMETA.json
 *.bs
 core.*
 
+Simple.def
 Simple.c
 adler32.c
 compress.c

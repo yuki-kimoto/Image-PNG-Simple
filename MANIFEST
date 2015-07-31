@@ -1,10 +1,14 @@
 adler32.c
+BmpIoLib.c
+BmpIoLib.h
 Changes
 compress.c
 crc32.c
 crc32.h
 deflate.c
 deflate.h
+dll.base
+dll.exp
 gzclose.c
 gzguts.h
 gzlib.c
@@ -360,9 +364,9 @@ ppport.h
 README
 Simple.xs
 t/basic.t
-t/dog.bmp
-t/dog_copy.bmp
-t/dog_copy.png
+t/images/dog.bmp
+t/images/dog_copy.bmp
+t/images/dog_copy.png
 trees.c
 trees.h
 uncompr.c
