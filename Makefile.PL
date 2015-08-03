@@ -85,6 +85,8 @@ for my $zlib_source (@zlib_sources) {
   push @cleanup_files, $zlib_source;
 }
 
+push @cleanup_files, 'Image-PNG-Simple-*';
+
 WriteMakefile(
     NAME              => 'Image::PNG::Simple',
     VERSION_FROM      => 'lib/Image/PNG/Simple.pm', # finds $VERSION

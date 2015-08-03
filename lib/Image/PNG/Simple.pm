@@ -1,10 +1,10 @@
 package Image::PNG::Simple;
 
-use 5.00807;
+use 5.008007;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
@@ -14,6 +14,10 @@ XSLoader::load('Image::PNG::Simple', $VERSION);
 =head1 NAME
 
 Image::PNG::Simple - Convert bitmap file to png file without C library dependency.
+
+=head1 CAUTION
+
+This is beta release. API will be changed without warnings.
 
 =head1 SYNOPSIS
 
