@@ -10,12 +10,24 @@
 #include "BmpIoLib.h"
 
 /* Windows setjmp and longjmp don't work by Perl default */
-#if defined(WIN32) || defined(_MSC_VER)
+#if defined(_WIN32) || defined(_WIN64)
 #  undef setjmp
 #  undef longjmp
-#  include <setjmp.h>
-#  if defined(__MINGW32_VERSION)
-#    define setjmp(x) _setjmp(x)
+
+#  if defined(__MINGW32__)
+     // Copied from MinGW setjmp.h
+#    ifdef _WIN64
+#      if (__MINGW_GCC_VERSION < 40702)
+#        define setjmp(BUF) _setjmp((BUF), mingw_getsp())
+#      else
+#        define setjmp(BUF) _setjmp((BUF), __builtin_frame_address (0))
+#      endif
+#    else
+#      define setjmp(BUF) _setjmp3((BUF), NULL)
+#    endif
+     __declspec(noreturn) __attribute__ ((__nothrow__)) void __cdecl longjmp(jmp_buf _Buf,int _Value);
+#  else
+#    include <setjmp.h>
 #  endif
 #endif
 
