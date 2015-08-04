@@ -1,5 +1,7 @@
 Revision history for Perl extension Image::PNG::Simple.
 
+0.04 (2015-08-04) (beta release)
+  - fix bug that MinGW 32bit don't work
 0.03 (2015-08-03) (beta release)
   - fix bug that don't work in Perl 5.8
 0.02 (2015-08-01) (beta release)
