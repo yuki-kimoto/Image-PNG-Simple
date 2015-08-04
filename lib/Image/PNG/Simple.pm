@@ -3,11 +3,29 @@ package Image::PNG::Simple;
 use 5.008007;
 use strict;
 use warnings;
+use File::Temp ();
+use Carp 'croak';
 
 our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
+
+sub read_bmp_data {
+  my ($self, $data) = @_;
+  
+  my $tmp_dir = File::Temp->newdir;
+  my $tmp_file = "$tmp_dir/tmp.bmp";
+  
+  open my $out_fh, '>', $tmp_file
+    or croak "Can't open file $tmp_file for write: $!";
+  
+  binmode $out_fh;
+  print $out_fh $data;
+  close $out_fh;
+  
+  $self->read_bmp_file($tmp_file);
+}
 
 1;
 
@@ -49,6 +67,12 @@ Create new Image::PNG::Simple object.
   $ips->read_bmp_file('dog.bmp');
 
 Read bitmap file.
+
+=head2 read_bmp_data
+
+  $ips->read_bmp_data($bmp_data);
+
+Read bitmap binary data.
 
 =head2 write_bmp_file
 
