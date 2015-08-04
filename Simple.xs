@@ -124,6 +124,7 @@ write_bmp(...)
     croak("Can't open file %s for writing", file);
   }  
   BmpIO_Save(out_fh, ips->pBmp);
+  fclose(out_fh);
 
   XSRETURN(0);
 }
