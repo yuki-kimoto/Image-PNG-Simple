@@ -75,7 +75,7 @@ DESTORY(...)
 }
 
 SV
-read_bmp(...)
+read_bmp_file(...)
   PPCODE :
 {
   SV* ips_obj = ST(0);
@@ -103,7 +103,7 @@ read_bmp(...)
 }
 
 SV
-write_bmp(...)
+write_bmp_file(...)
   PPCODE:
 {
   SV* ips_obj = ST(0);
@@ -130,7 +130,7 @@ write_bmp(...)
 }
 
 SV
-write_png(...)
+write_png_file(...)
   PPCODE:
 {
   SV* ips_obj = ST(0);

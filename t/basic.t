@@ -12,15 +12,15 @@ BEGIN { use_ok('Image::PNG::Simple') };
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->read_bmp('t/images/dog.bmp');
+  $ips->read_bmp_file('t/images/dog.bmp');
   
   # Write png and bitmap file
   my $tmp_dir = File::Temp->newdir;
   my $dir_name = $tmp_dir->dirname;
   my $dog_copy_bmp_file = "$dir_name/dog_copy.bmp";
   my $dog_copy_png_file = "$dir_name/dog_copy.png";
-  $ips->write_bmp($dog_copy_bmp_file);
-  $ips->write_png($dog_copy_png_file);
+  $ips->write_bmp_file($dog_copy_bmp_file);
+  $ips->write_png_file($dog_copy_png_file);
   
   my $dog_copy_bmp;
   {

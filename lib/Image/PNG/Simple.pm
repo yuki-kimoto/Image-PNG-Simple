@@ -4,7 +4,7 @@ use 5.008007;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
@@ -27,10 +27,10 @@ This is beta release. API will be changed without warnings.
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->read_bmp('dog.bmp');
+  $ips->read_bmp_file('dog.bmp');
   
   # Write png file
-  $ips->write_png('dog.png');
+  $ips->write_png_file('dog.png');
 
 =head1 DESCRIPTION
 
@@ -44,21 +44,21 @@ Convert bitmap file to png file without C library dependency.
 
 Create new Image::PNG::Simple object.
 
-=head2 read_bmp
+=head2 read_bmp_file
 
-  $ips->read_bmp('dog.bmp');
+  $ips->read_bmp_file('dog.bmp');
 
 Read bitmap file.
 
-=head2 write_bmp
+=head2 write_bmp_file
 
-  $ips->write_bmp('dog_copy.bmp');
+  $ips->write_bmp_file('dog_copy.bmp');
 
 Write bitmap file.
 
-=head2 write_png
+=head2 write_png_file
 
-  $ips->write_png('dog.png');
+  $ips->write_png_file('dog.png');
 
 Write png file.
 

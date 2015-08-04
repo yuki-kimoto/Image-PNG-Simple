@@ -1,5 +1,8 @@
 Revision history for Perl extension Image::PNG::Simple.
-
+0.05 (2015-08-04) (beta release)
+  - rename read_bmp to read_bmp_file
+  - rename write_bmp to write_bmp_file
+  - rename write_png to write_png_file
 0.04 (2015-08-04) (beta release)
   - fix bug that MinGW 32bit don't work
 0.03 (2015-08-03) (beta release)
