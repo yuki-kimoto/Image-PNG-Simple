@@ -17,7 +17,7 @@ BEGIN { use_ok('Image::PNG::Simple') };
   
   binmode($bmp_fh);
   my $bmp_data = do { local $/; <$bmp_fh> };
-  $ips->read_bmp_data($bmp_data);
+  $ips->parse_bmp_data($bmp_data);
 
   # Write bitmap file
   my $tmp_dir = File::Temp->newdir;
@@ -54,7 +54,7 @@ BEGIN { use_ok('Image::PNG::Simple') };
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->read_bmp_file('t/images/dog.bmp');
+  $ips->parse_bmp_file('t/images/dog.bmp');
   
   # Write png and bitmap file
   my $tmp_dir = File::Temp->newdir;

@@ -75,7 +75,7 @@ DESTORY(...)
 }
 
 SV
-read_bmp_file(...)
+parse_bmp_file(...)
   PPCODE :
 {
   SV* ips_obj = ST(0);

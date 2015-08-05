@@ -11,7 +11,7 @@ our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
 
-sub read_bmp_data {
+sub parse_bmp_data {
   my ($self, $data) = @_;
   
   my $tmp_dir = File::Temp->newdir;
@@ -24,8 +24,32 @@ sub read_bmp_data {
   print $out_fh $data;
   close $out_fh;
   
-  $self->read_bmp_file($tmp_file);
+  $self->parse_bmp_file($tmp_file);
 }
+
+sub write_bmp_data {
+  my ($self, $data) = @_;
+ 
+  my $tmp_dir = File::Temp->newdir;
+  my $tmp_file = "$tmp_dir/tmp.bmp";
+  
+  open my $out_fh, '>', $tmp_file
+    or croak "Can't open file $tmp_file for write: $!";
+
+  $self->write_bmp_file($tmp_file);
+  close $out_fh;
+  
+  open my $in_fh, '<', $tmp_file
+    or croak "Can't open file $tmp_file for read: $!";
+  
+  
+  
+  binmode $out_fh;
+  print $out_fh $data;
+  close $out_fh;
+  
+}
+
 
 1;
 
@@ -45,7 +69,7 @@ This is beta release. API will be changed without warnings.
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->read_bmp_file('dog.bmp');
+  $ips->parse_bmp_file('dog.bmp');
   
   # Write png file
   $ips->write_png_file('dog.png');
@@ -62,15 +86,15 @@ Convert bitmap file to png file without C library dependency.
 
 Create new Image::PNG::Simple object.
 
-=head2 read_bmp_file
+=head2 parse_bmp_file
 
-  $ips->read_bmp_file('dog.bmp');
+  $ips->parse_bmp_file('dog.bmp');
 
 Read bitmap file.
 
-=head2 read_bmp_data
+=head2 parse_bmp_data
 
-  $ips->read_bmp_data($bmp_data);
+  $ips->parse_bmp_data($bmp_data);
 
 Read bitmap binary data.
 
