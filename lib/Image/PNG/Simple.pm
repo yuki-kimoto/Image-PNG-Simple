@@ -118,6 +118,18 @@ Read bitmap file.
 
 Prase bitmap binary data.
 
+=head2 get_bmp_data
+
+  $ips->get_bmp_data;
+
+Get bitmap binary data.
+
+=head2 get_png_data
+
+  $ips->get_png_data;
+  
+Get png binary data.
+
 =head2 write_bmp_file
 
   $ips->write_bmp_file('dog_copy.bmp');
