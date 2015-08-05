@@ -27,29 +27,27 @@ sub parse_bmp_data {
   $self->parse_bmp_file($tmp_file);
 }
 
-sub write_bmp_data {
-  my ($self, $data) = @_;
- 
+sub get_bmp_data {
+  my $self = shift;
+  
   my $tmp_dir = File::Temp->newdir;
   my $tmp_file = "$tmp_dir/tmp.bmp";
   
+  # Write bmp data to temp file
   open my $out_fh, '>', $tmp_file
     or croak "Can't open file $tmp_file for write: $!";
-
   $self->write_bmp_file($tmp_file);
   close $out_fh;
   
+  # Read bmp data from temp file
   open my $in_fh, '<', $tmp_file
     or croak "Can't open file $tmp_file for read: $!";
+  binmode($in_fh);
+  my $bmp_data = do { local $/; <$in_fh> };
+  close $in_fh;
   
-  
-  
-  binmode $out_fh;
-  print $out_fh $data;
-  close $out_fh;
-  
+  return $bmp_data;
 }
-
 
 1;
 
@@ -96,7 +94,7 @@ Read bitmap file.
 
   $ips->parse_bmp_data($bmp_data);
 
-Read bitmap binary data.
+Prase bitmap binary data.
 
 =head2 write_bmp_file
 
