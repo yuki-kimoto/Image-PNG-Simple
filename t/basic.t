@@ -20,7 +20,7 @@ BEGIN { use_ok('Image::PNG::Simple') };
 
   # Get bitmap data
   my $dog_copy_bmp = $ips->get_bmp_data;
-
+  
   my $dog_copy_bmp_expected_file = "$FindBin::Bin/images/dog_copy.bmp";
   my $dog_copy_bmp_expected;
   {
@@ -34,6 +34,24 @@ BEGIN { use_ok('Image::PNG::Simple') };
   }
   else {
     fail('Compare dog_copy.bmp');
+  }
+
+  # Get png data
+  my $dog_copy_png = $ips->get_png_data;
+
+  my $dog_copy_png_expected_file = "$FindBin::Bin/images/dog_copy.png";
+  my $dog_copy_png_expected;
+  {
+    open my $fh, '<', $dog_copy_png_expected_file
+      or die "Can't open file $dog_copy_png_expected_file";
+    binmode($fh);
+    read($fh, $dog_copy_png_expected, -s $dog_copy_png_expected_file); 
+  }
+  if ($dog_copy_png eq $dog_copy_png_expected) {
+    pass('Compare dog_copy.png');
+  }
+  else {
+    fail('Compare dog_copy.png');
   }
 }
 

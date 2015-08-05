@@ -49,6 +49,28 @@ sub get_bmp_data {
   return $bmp_data;
 }
 
+sub get_png_data {
+  my $self = shift;
+  
+  my $tmp_dir = File::Temp->newdir;
+  my $tmp_file = "$tmp_dir/tmp.png";
+  
+  # Write png data to temp file
+  open my $out_fh, '>', $tmp_file
+    or croak "Can't open file $tmp_file for write: $!";
+  $self->write_png_file($tmp_file);
+  close $out_fh;
+  
+  # Read png data from temp file
+  open my $in_fh, '<', $tmp_file
+    or croak "Can't open file $tmp_file for read: $!";
+  binmode($in_fh);
+  my $png_data = do { local $/; <$in_fh> };
+  close $in_fh;
+  
+  return $png_data;
+}
+
 1;
 
 =head1 NAME
