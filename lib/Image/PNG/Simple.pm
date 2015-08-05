@@ -6,7 +6,7 @@ use warnings;
 use File::Temp ();
 use Carp 'croak';
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
@@ -79,7 +79,7 @@ Image::PNG::Simple - Convert bitmap file to png file without C library dependenc
 
 =head1 CAUTION
 
-This is beta release. API will be changed without warnings.
+B<This is beta release. API will be changed without warnings.>
 
 =head1 SYNOPSIS
 

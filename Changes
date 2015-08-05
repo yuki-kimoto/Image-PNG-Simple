@@ -1,4 +1,8 @@
 Revision history for Perl extension Image::PNG::Simple.
+0.06 (2015-08-05) (beta release)
+  - add get_bmp_data method
+  - add get_png_data method
+  - rename read_bmp_data to parse_bmp_data
 0.05 (2015-08-04) (beta release)
   - rename read_bmp to read_bmp_file
   - rename write_bmp to write_bmp_file
