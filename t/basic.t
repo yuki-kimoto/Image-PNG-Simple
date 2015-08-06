@@ -60,7 +60,7 @@ BEGIN { use_ok('Image::PNG::Simple') };
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->parse_bmp_file('t/images/dog.bmp');
+  $ips->read_bmp_file('t/images/dog.bmp');
   
   # Write png and bitmap file
   my $tmp_dir = File::Temp->newdir;

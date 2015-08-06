@@ -6,7 +6,7 @@ use warnings;
 use File::Temp ();
 use Carp 'croak';
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require XSLoader;
 XSLoader::load('Image::PNG::Simple', $VERSION);
@@ -24,7 +24,7 @@ sub parse_bmp_data {
   print $out_fh $data;
   close $out_fh;
   
-  $self->parse_bmp_file($tmp_file);
+  $self->read_bmp_file($tmp_file);
 }
 
 sub get_bmp_data {
@@ -89,7 +89,7 @@ B<This is beta release. API will be changed without warnings.>
   my $ips = Image::PNG::Simple->new;
   
   # Read bitmap file
-  $ips->parse_bmp_file('dog.bmp');
+  $ips->read_bmp_file('dog.bmp');
   
   # Write png file
   $ips->write_png_file('dog.png');
@@ -106,9 +106,9 @@ Convert bitmap file to png file without C library dependency.
 
 Create new Image::PNG::Simple object.
 
-=head2 parse_bmp_file
+=head2 read_bmp_file
 
-  $ips->parse_bmp_file('dog.bmp');
+  $ips->read_bmp_file('dog.bmp');
 
 Read bitmap file.
 
@@ -154,6 +154,12 @@ L<Image::PNG>, L<Imager::File::PNG>, L<Image::PNG::Libpng>
 =head1 AUTHOR
 
 Yuki Kimoto E<lt>kimoto.yuki@gmail.comE<gt>
+
+=head1 REPOSITORY and BUG REPORT
+
+Tell me on Github Repository
+
+L<https://github.com/yuki-kimoto/Image-PNG-Simple>
 
 =head1 COPYRIGHT AND LICENSE
 
