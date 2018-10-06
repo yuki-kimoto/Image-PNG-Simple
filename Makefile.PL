@@ -98,5 +98,15 @@ WriteMakefile(
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     OBJECT            => '$(O_FILES)', # link all the C files too.
-    clean             =>  {FILES => join(' ', @cleanup_files)}
+    clean             =>  {FILES => join(' ', @cleanup_files)},
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        resources => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/yuki-kimoto/Image-PNG-Simple.git',
+                web  => 'https://github.com/yuki-kimoto/Image-PNG-Simple',
+            },
+        },
+    },
 );
