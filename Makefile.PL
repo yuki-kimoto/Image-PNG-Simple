@@ -96,6 +96,7 @@ WriteMakefile(
        AUTHOR         => 'A. U. Thor <kimoto@sakura.ne.jp>') : ()),
     LIBS              => [''], # e.g., '-lm'
     DEFINE            => '', # e.g., '-DHAVE_SOMETHING'
+    LICENSE           => 'perl_5',
     INC               => '-I.', # e.g., '-I. -I/usr/include/other'
     OBJECT            => '$(O_FILES)', # link all the C files too.
     clean             =>  {FILES => join(' ', @cleanup_files)}
